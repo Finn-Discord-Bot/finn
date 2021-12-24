@@ -160,22 +160,25 @@ async def _testinput(ctx: SlashContext, ticker_list: str):
 async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: str, money: int):
     await ctx.send(content=f"I got you, you said {portfoliotype, tickerlist, str(money)}!")
 
-# @slash.slash(
-#     name = "DisplayPortfolio",
-#     description = "Command associated with displaying portfolio",
-#     guild_ids = guilds,
-#     options=[
-#         create_option(
-#             name="DisplayPortfolio",
-#             description="This is the first option we have.",
-#             option_type=3,
-#             required=True
-#         )
-#     ]
-# )
-# async def _CreatePortfolio(ctx: SlashContext, poo: str):
-    
-#     await ctx.send(content=f"I got you, you said {poo}!")
+@slash.slash(
+    name = "DisplayPortfolio",
+    description = "Command associated with displaying portfolio",
+    guild_ids = guilds
+)
+async def _DisplayPortfolio(ctx: SlashContext):
+    user_id = ctx.author.id
+    # #Get
+    await ctx.send(content=f"I've caught your uuid in 4K: {user_id}!")
+
+
+# slash command for stock info
+@slash.slash(
+    name = "StockInfo"
+    description = "What kind of information would you like to know?",
+    guild_ids = guilds,
+)
+async def _StockInfo(ctx:SlashContext):
+
 
 # Test - just making sure i understand 
 @slash.slash(
