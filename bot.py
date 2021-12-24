@@ -9,7 +9,9 @@ import json
 import os
 import asyncio
 
-# import finance_functions
+from finance_functions import *
+from connect_database import *
+# from smart_weights import *
 
 TEST = True
 
@@ -36,7 +38,7 @@ def get_guilds():
 dmfailed = discord.Embed(
     title="DM Failed",
     description='',
-    timestamp=datetime.datetime.utcnow(),
+    timestamp=datetime.utcnow(),
     color=discord.Color.from_rgb(240, 71, 71)
 )
 
@@ -86,7 +88,17 @@ async def _ping(ctx: SlashContext):
         title="embed test",
         description = "this is just a test")  
     await ctx.send(content="hello", embeds=[embed])
-    
+
+
+@slash.slash(name="lasttradingday", description="Displays the last completed trading day")
+async def _lasttradingday(ctx: SlashContext):
+    last_trade_day = last_trading_day()
+    embed = discord.Embed(
+        title="Last Trading Day",
+        description=last_trade_day)  
+    await ctx.send(embeds=[embed])
+
+
 # User Input
 @slash.slash(
     name = "testinput",
@@ -102,50 +114,62 @@ async def _ping(ctx: SlashContext):
 async def _testinput(ctx: SlashContext, ticker_list: str):
     await ctx.send(content=f"I got you, you said {ticker_list}!")
 
+@slash.slash(
+    name = "CreatePortfolio",
+    description = "Command associated with portfolio creation",
+    guild_ids = guilds,
+    options=[
+        create_option(
+            name="portfoliotype",
+            description="What type of portfolio would you like to create?",
+            option_type=3,
+            required=True,
+            choices = [
+                create_choice(
+                    name = "Price Weighted Index",
+                    value = "PRICE WEIGHTED"
+                ),
+                create_choice(
+                    name = "Market-Capitalization Weighted Index",
+                    value = "MARKET WEIGHTED"
+                ),
+                create_choice(
+                    name = "Risky Smart Weighted Portfolio",
+                    value = "RISKY"
+                ),
+                create_choice(
+                    name = "Safe Smart Weighted Portfolio",
+                    value = "SAFE"
+                )
+            ]
+        ),
+        create_option(
+            name="tickerlist",
+            description="Enter a space-seperated list of tickers.",
+            option_type=3,
+            required=True
+        ),
+        create_option(
+            name="money",
+            description="The total amount of money you want to invest (Dollars).",
+            option_type=4,
+            required=True
+        )
+    ]
+)
+async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: str, money: int):
+    await ctx.send(content=f"I got you, you said {portfoliotype, tickerlist, str(money)}!")
+
 # @slash.slash(
-#     name = "CreatePortfolio",
-#     description = "Command associated with portfolio creation",
+#     name = "DisplayPortfolio",
+#     description = "Command associated with displaying portfolio",
 #     guild_ids = guilds,
 #     options=[
 #         create_option(
-#             name="poo",
+#             name="DisplayPortfolio",
 #             description="This is the first option we have.",
 #             option_type=3,
-#             required=True,
-#             choices = [
-#                 create_option(
-#                     name = "Add stock(s) to portfolio",
-#                     description = "Type out your stocks",
-#                     option_type = 3,
-#                     required = True
-#                 ),
-#                 create_option(
-#                     name = "Remove stock(s) to portfolio",
-#                     description = "Type out your stocks",
-#                     option_type = 3,
-#                     required = True
-#                 ),
-#                 create_option(
-#                     name = "Display portfolio",
-#                     description="Display Portfolio as either PWI or MWI",
-#                     option_type=3,
-#                     required=True,
-#                     choices = [
-#                         create_option(
-#                             name = "PWI",
-#                             description = "Price Weighted Index",
-#                             option_type = 6,
-#                             required = True
-#                         ),
-#                         create_option(
-#                             name = "MWI",
-#                             description = "Market Weighted Index",
-#                             option_type = 6,
-#                             required = True
-#                         )
-#                     ] 
-#                 )
-#             ]
+#             required=True
 #         )
 #     ]
 # )
