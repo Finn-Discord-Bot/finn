@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from discord import guild
 from discord_slash import SlashCommand, SlashContext
 from discord_slash.utils.manage_commands import create_choice, create_option
 import datetime
@@ -47,9 +46,8 @@ async def pingdm(ctx):
         await ctx.message.add_reaction(check_reaction)
     except discord.Forbidden:
         await ctx.send(embed=dmfailed)
-guildids = [908530130274648104]
 # Slash Commands
-@slash.slash(name="ping", description="Ping command",guild_ids=guildids)
+@slash.slash(name="ping", description="Ping command")
 async def _ping(ctx: SlashContext):
     await ctx.send("Pong")
     
