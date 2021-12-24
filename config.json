@@ -1,4 +1,10 @@
 {
-  "token": "",
-  "token_test": ""
+"_Discord Bot": "Import Bot Tokens below if applicable",
+"token": "",
+"token_test": ""
+
+"_DataStacks Astra Keys_": "Import your DataStax Astra Keys below",
+"secure_connect_bundle": "<PATH-TO-SECURE-CONNECT-BUNDLE.zip>",
+"CLIENT_ID": "",
+"CLIENT_SECRET":"",
 }
