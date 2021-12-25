@@ -13,6 +13,10 @@ auth_provider = PlainTextAuthProvider(conf["CLIENT_ID"], conf["CLIENT_SECRET"]) 
 cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
 session = cluster.connect('portfolios')  # select keyspace
 
+# Adds a dataframe straight to the portfolio
+def add_portfolio(portfolio_df):
+    pass
+
 
 # Adds a stock to a user's portfolio
 def add_stock(uuid: int, ticker: str, qnty: float, settledate):

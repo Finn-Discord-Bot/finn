@@ -98,6 +98,13 @@ async def _lasttradingday(ctx: SlashContext):
         description=last_trade_day)  
     await ctx.send(embeds=[embed])
 
+@slash.slash(name="help", description = "Provides a list of possible commands")
+async def _help(ctx: SlashContext):
+    embed = discord.Embed(
+        title = "Commands",
+        description = "[put commands here]") # FINISH THIS LATER WHEN ALL COMMANDS ARE DONE
+    await ctx.send(embeds=[embed])
+
 
 # User Input
 @slash.slash(
@@ -113,6 +120,8 @@ async def _lasttradingday(ctx: SlashContext):
 )
 async def _testinput(ctx: SlashContext, ticker_list: str):
     await ctx.send(content=f"I got you, you said {ticker_list}!")
+
+    
 
 @slash.slash(
     name = "CreatePortfolio",
@@ -167,40 +176,68 @@ async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: st
 )
 async def _DisplayPortfolio(ctx: SlashContext):
     user_id = ctx.author.id
-    # #Get
-    await ctx.send(content=f"I've caught your uuid in 4K: {user_id}!")
+    # #Get portfolio using user_id
+    # ...
+    await ctx.send(file=discord.File(f'process/{user_id}.png'))
+    os.remove(f'process/{user_id}.png')
+    # await ctx.send(content=f"I've caught your uuid in 4K: {user_id}!")
 
 
 # slash command for stock info
 @slash.slash(
-    name = "StockInfo"
-    description = "What kind of information would you like to know?",
+    name = "StockInfo",
+    description = "Here is the preview of the specified ticker.",
     guild_ids = guilds,
+    options = [
+        create_option(
+            name = "ticker",
+            description = "What Ticker would you like to search?",
+            required = True,
+            option_type = 3
+        )
+    ]
 )
-async def _StockInfo(ctx:SlashContext):
-
-
-# Test - just making sure i understand 
-@slash.slash(
-    name = "gettinginfo",
-    description = "Getting some info of the server",
-    guild_ids = guilds
-)
-async def _gettinginfo(ctx : SlashContext):
-    name = str(ctx.guild.name)
-    description = str(ctx.guild.description)
-    serverID = str(ctx.guild.id)
-    memberCount = str(ctx.guild.member_count)
-    picture = str(ctx.guild.icon_url)
-
-    embed = discord.Embed(
-        title = name,
-        description = description
+async def _StockInfo(ctx:SlashContext, ticker: str):
+    ticker = ticker.upper()
+    response = discord.Embed(
+        title = f"{ticker} Info",
+        description = "Description",
+        colour = discord.Colour.blue()    
     )
-    embed.set_thumbnail(url=picture)
-    embed.add_field(name = "Server ID", value = serverID, inline = True)
-    embed.add_field(name = "# of Members", value = memberCount, inline = True)
-    await ctx.send(content = 'gettinginfo', embed=embed)
+    
+    data = stock_info(ticker)
+    response.set_footer(text="footer")
+    response.set_author(name="Finn Bot")
+    response.add_field(name='Beta', value=data['Beta'], inline=True)
+    response.add_field(name='STD', value=data['STD'], inline=True)
+    response.add_field(name='52Wk High', value=data['52Wk High'], inline=True)
+    response.add_field(name='52Wk Low', value=data['52Wk Low'], inline=True)
+    response.add_field(name='Last Trading Day Open', value=data['Last Trading Day Open'], inline=True)
+    response.add_field(name='Last Trading Day Close', value=data['Last Trading Day Close'], inline=True)
+    await ctx.send(embed=response)
+
+# # Test - just making sure i understand 
+# @slash.slash(
+#     name = "gettinginfo",
+#     description = "Getting some info of the server",
+#     guild_ids = guilds
+# )
+# #testFunc("AAPL")
+# async def _gettinginfo(ctx : SlashContext):
+#     name = str(ctx.guild.name)
+#     description = str(ctx.guild.description)
+#     serverID = str(ctx.guild.id)
+#     memberCount = str(ctx.guild.member_count)
+#     picture = str(ctx.guild.icon_url)
+
+#     embed = discord.Embed(
+#         title = name,
+#         description = description
+#     )
+#     embed.set_thumbnail(url=picture)
+#     embed.add_field(name = "Server ID", value = serverID, inline = True)
+#     embed.add_field(name = "# of Members", value = memberCount, inline = True)
+#     await ctx.send(content = 'gettinginfo', embed=embed)
 
 
 # Code to upload matplotlib figs
@@ -243,3 +280,11 @@ async def on_message(message):
 
 def start_bot():
     bot.run(token)
+
+
+
+
+
+
+
+    

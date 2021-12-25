@@ -42,22 +42,18 @@ def last_trading_day():
     return latest_day.strftime("%Y-%m-%d")
 
 
-# Stock Info (Open, High, Low, Close, Volume, Dividends, Stock Splits)
+# Stock Info (Open, High, Low, Close, Volume, Dividends, Stock Splits)  
+def stock_info(ticker):    
+    stock_infopkg = {}
+    beta_std = betastd(ticker)
+    stock_infopkg['Beta'] = f'{beta_std[0]:.2f}'
+    stock_infopkg['STD'] = f'{beta_std[1]:.2f}'
+    stock_infopkg['52Wk High'] = f'{beta_std[2][ticker].High.max():.2f}'
+    stock_infopkg['52Wk Low'] = f'{beta_std[2][ticker].Low.min():.2f}'
+    stock_infopkg['Last Trading Day Open'] = f'{beta_std[2][ticker].Open[-1]:.2f}'
+    stock_infopkg['Last Trading Day Close'] = f'{beta_std[2][ticker].Close[-1]:.2f}'
 
-def stock_info(ticker):
-    stock = yf.Ticker(ticker)
-    return stock 
-
-# stock = stock_info()
-# stock_info = stock.info
-    
-
-def stock_info(ticker):
-    stock = yf.Ticker(ticker)
-    stock_info = stock.info
-    stock_open = stock_info["open"]
-    stock_close = stock_info["close"]
-    return[stock_open, stock_close]
+    return stock_infopkg
 
 
 # PyZipFile Class for creating ZIP archives containing Python libraries.     class zipfile.ZipInfo(filename='NoName', date_time=, 1980, 1, 1, 0, 0, 0)
@@ -74,7 +70,8 @@ def valid_ticker_list(ticker_list):
                 )
     return list(dict.fromkeys([t[0] for t in ticker_hist.dropna(axis=1, how='all').columns]))
 
-
+def testFunc(ticker):
+    return (ticker + "abc")
 class Portfolio:
     
     def __init__(self, ticker_list, start_date, end_date, starting_balance):
@@ -134,20 +131,30 @@ def price_weighted(ticker_list, start_date, end_date):
 
     return pw_portfolio
 
-def make_price_weighted_portfolio(investment, ticker_list, start_date, end_date):
+def equally_weighted_portfolio(investment, ticker_list, start_date, end_date):
+    
+    today = date.today()
+    tmr = today + datetime.timedelta(days = 1)
 
     # Create DataFrame
-    pw_portfolio = pd.DataFrame()
+    
+    ew_portfolio = pd.DataFrame()
+    ew_portfolio['Tickers'] = ticker_list
     num_tickers = len(ticker_list)
-    pw_portfolio['Tickers'] = ticker_list
+    close = []
     value_per_stock = investment/num_tickers
-
-    # Add Close price columns for each stock
-    for i in range(len(ticker_list)):
-        ticker_hist = ticker_list[i].history(start = start_date, end = end_date)
-        pw_portfolio[f'{ticker_list[i]} Shares'] = value_per_stock/ticker_hist.Close
-
-    return pw_portfolio
+    shares = []
+    
+    for i in range (len(ticker_list)):
+        yf_ticker = yf.Ticker(ticker_list[i])
+        ticker_hist = yf_ticker.history(start=today, end=tmr)
+        shares.append(value_per_stock/ticker_hist.Close[0])
+        
+        
+    ew_portfolio['Shares'] = shares
+    ew_portfolio.set_index('Tickers', inplace=True)
+    
+    return ew_portfolio
 
 
 def market_weighted(ticker_list, start_date, end_date, starting_balance):
@@ -300,46 +307,29 @@ def portfolio_graphs(ticker_list, start_date, end_date, weight_option, userid):
             plt.savefig(f'process/{userid}.png')
 
 
-# Beta Value        NOTE: .info returns a different value from the manual calculation
-def beta(ticker, start_date, end_date):
+# Beta Value       
+def betastd(ticker):
     stock = yf.Ticker(ticker)
     market = yf.Ticker('^GSPC')
-    today = date.today()
-    tomorrow = today + datetime.timedelta(days = 1)
     
-    if type(stock.info['beta']) == int or type(stock.info['beta']) == float:
-        return stock.info['beta']
-    else:
-        # If no date was inputted, use data from today 
-        if start_date == "" or end_date == "":
-            stock_hist = stock.history(start = today, end = tomorrow)
-            market_hist = market.history(start = today, end = tomorrow)
-
-            prices = pd.DataFrame(stock_hist.Close) 
-            prices.columns = [ticker]
-            prices[market] = market_hist['Close']
-
-            # Note: unable to take pct_change or covariance with only one day available
-            returns = prices.iloc[0,0]
-            market_var = prices.iloc[0,1]
-            Beta = returns/market_var
-            return Beta 
-        else: 
-            stock_hist = stock.history(start = start_date, end = end_date)
-            market_hist = market.history(start = start_date, end = end_date)
-
-            prices = pd.DataFrame(stock_hist.Close)
-            prices.columns = [ticker]
-            prices[market] = market_hist['Close']
-            # Calculate monthly returns
-            monthly_returns = prices.resample('M').ffill().pct_change()
-            monthly_returns.drop(index=monthly_returns.index[0], inplace=True)
-            # Calculate the market variance
-            market_var = monthly_returns[market].var()
-        
-            # Calculate the ticker's beta value
-            Beta = monthly_returns.cov()/market_var
-            return Beta.iloc[0,1]      
+    ticker_hist = yf.download(
+                    tickers = " ".join([ticker, '^GSPC']),
+                    # Download Data From the past 6 months
+                    period = "12mo",
+                    interval = "1d",
+                    group_by = 'tickers',
+                    threads = True
+                )
+    prices = pd.DataFrame(ticker_hist[ticker].Close)
+    prices.columns = [ticker]
+    prices['^GSPC'] = ticker_hist['^GSPC'].Close
+    # Calculate monthly returns
+    monthly_returns = prices.resample('M').ffill().pct_change()
+    monthly_returns.drop(index=monthly_returns.index[0], inplace=True)
+    # Calculate the market variance
+    MarketVar = monthly_returns['^GSPC'].var()
+    Beta=monthly_returns.cov()/MarketVar
+    return (Beta.iat[0,1], monthly_returns[ticker].std(), ticker_hist)
 
 
 # Sharpe Ratio
