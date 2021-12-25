@@ -70,8 +70,7 @@ def valid_ticker_list(ticker_list):
                 )
     return list(dict.fromkeys([t[0] for t in ticker_hist.dropna(axis=1, how='all').columns]))
 
-def testFunc(ticker):
-    return (ticker + "abc")
+
 class Portfolio:
     
     def __init__(self, ticker_list, start_date, end_date, starting_balance):
@@ -109,10 +108,12 @@ class Portfolio:
 
 def stock_history(ticker, start_date, end_date):
     current_date = date.today()
+    stock = yf.Ticker(ticker)
     if start_date == "" or end_date == "":
         stock_history = stock.history(start = date.today, end = date.today) 
     else:
         stock_history = stock.history(start = start_date, end = end_date) 
+    return stock_history
 
 
 def price_weighted(ticker_list, start_date, end_date):
@@ -226,9 +227,15 @@ def company_info(ticker):
 def regenerate_portfolio(portfolio: dict):
     last_tday = last_trading_day()
     incep_dates = []
+    
+    # Create a list of dates to find the earliest date
     for ticker in portfolio:
         incep_dates.append(portfolio[ticker][1])
+    
+    # Find the smallest date (earliest)
     earliest_date = sorted(incep_dates)[0]
+    
+    # Download Stock Data
     pricing_data = yf.download(
         tickers = " ".join(ticker for ticker in portfolio),
         start=earliest_date,
@@ -240,18 +247,23 @@ def regenerate_portfolio(portfolio: dict):
     portfolio_df = pd.DataFrame()
     portfolio_df["Dates"] = pd.date_range(start=earliest_date, end=last_tday, freq="B")
     portfolio_df.set_index("Dates", inplace = True)
-
+    
+    # Find total investment (the amount of money put in)
+    investment = 0
+    for ticker in portfolio:
+        investment += pricing_data[ticker].loc[portfolio[ticker][1]] * portfolio[ticker][0]
+        
     for ticker in portfolio:
         portfolio_df[f'{ticker}_SHARES'] = 0
-        print(portfolio_df)
         portfolio_df[f'{ticker}_SHARES'].loc[portfolio[ticker][1]:] += float(portfolio[ticker][0])
-        print(portfolio_df)
         portfolio_df[f'{ticker}_CLOSE'] = pricing_data[ticker].Close
-        # portfolio_df.fillna(inplace=True)
         portfolio_df[f'{ticker}_VALUE'] = portfolio_df[f'{ticker}_SHARES'] * portfolio_df[f'{ticker}_CLOSE']  
     
     portfolio_df.dropna(how='all', inplace=True)
-    print(portfolio_df)
+    portfolio_df['TOTAL_VALUE'] = portfolio_df.filter(like='_VALUE').sum(axis=1)
+    portfolio_df = portfolio_df[['TOTAL_VALUE']].loc[(portfolio_df[['TOTAL_VALUE']]!=0).any(axis=1)]
+    portfolio_df['RETURNS'] = portfolio_df['TOTAL_VALUE'].pct_change() * 100
+    return (portfolio_df[['TOTAL_VALUE', 'RETURNS']], investment)
 
     
     
@@ -270,81 +282,23 @@ def regenerate_portfolio(portfolio: dict):
 # print(get_portfolio(00000))
 
 def portfolio_graphs(portfolio: dict, userid: int):
-    return None
-
-    # Get last trading day
-    latest_trading_day = last_trading_day()
-
     # Create desired portfolio with ticker list
-    portfolio = regenerate_portfolio()
+    data = regenerate_portfolio(portfolio)
+    portfolio_df = data[0]
+    initial_investment = data[1]
+    print(portfolio_df)
 
-    weight = weight_option.upper()
+    # Initiate plot
 
-    # Get monthly Data
-    monthly_data = portfolio.resample('MS').first()
-    
-    if weight == 'PRICE WEIGHTED':
-        
-        # Initiate plot
-        fig, ((ax1), (ax2)) = plt.subplot(2,1)
-        fig.set_size_inches(20,20)
+    plt.suptitle(f'Daily Portfolio Returns: {portfolio_df.index[0].strftime("%Y-%m-%d")} to {portfolio_df.index[-1].strftime("%Y-%m-%d")}')
 
-        fig.suptitle(f'{weight_option} Portfolio Returns: {start_date} to {end_date}')
+    plt.plot(portfolio_df.index, portfolio_df['TOTAL_VALUE'])
+    plt.xlabel('Dates')
+    plt.ylabel('Value ($)')
 
-        ax1.plot(portfolio.index, portfolio['Price Weighted Index'])
-        ax1.set_title(f'Daily Portfolio Returns ({weight_option})')
-        ax1.set_xlable('Dates')
-        ax1.set_ylabel('Returns')
-        
-        ax2.plot(portfolio.index, monthly_data['Price Weighted Index'])
-        ax2.set_title(f'Monthly Portfolio Value ({weight_option})')
-        ax2.set_xlabel('Dates')
-        ax2.set_ylabel('Returns')
-
-        # Create png of graphs
-        plt.savefig(f'process/{userid}.png')
-
-    elif weight == 'MARKET WEIGHTED':
-
-        # Initiate plot
-        fig, ((ax1), (ax2)) = plt.subplot(2,1)
-        fig.set_size_inches(20,20)
-
-        fig.suptitle(f'{weight_option} Portfolio Returns: {start_date} to {end_date}')
-
-        ax1.plot(portfolio.index, portfolio['Market Weighted Index'])
-        ax1.set_title(f'Daily Portfolio Returns ({weight_option})')
-        ax1.set_xlable('Dates')
-        ax1.set_ylabel('Returns')
-        
-        ax2.plot(portfolio.index, monthly_data['Market Weighted Index'] )
-        ax2.set_title(f'Monthly Portfolio Value ({weight_option})')
-        ax2.set_xlabel('Dates')
-        ax2.set_ylabel('Returns')
-
-        # Create png of graphs
-        plt.savefig(f'process/{userid}.png')
-    
-    elif weight == 'SMART WEIGHTED':
-
-        # Initiate plot
-        fig, ((ax1), (ax2)) = plt.subplot(2,1)
-        fig.set_size_inches(20,20)
-
-        fig.suptitle(f'{weight_option} Portfolio Returns: {start_date} to {end_date}')
-
-        ax1.plot(portfolio.index, portfolio['Smart Weighted Index'])
-        ax1.set_title(f'Daily Portfolio Returns ({weight_option})')
-        ax1.set_xlable('Dates')
-        ax1.set_ylabel('Returns')
-        
-        ax2.plot(portfolio.index, monthly_data['Smart Weighted Index'])
-        ax2.set_title(f'Monthly Portfolio Value ({weight_option})')
-        ax2.set_xlabel('Dates')
-        ax2.set_ylabel('Returns')
-
-        # Create png of graphs
-        plt.savefig(f'process/{userid}.png')
+    # Create png of graphs
+    plt.savefig(f'process/{userid}.png')
+    return (initial_investment, portfolio_df['TOTAL_VALUE'][-1])
 
 
 
@@ -406,7 +360,7 @@ def pe_ratio(ticker_list):
 
 # Options
 #Requires the user to input a price range and put/call 
-def options(ticker, price, range, put_call):
+def options(ticker, range_length, put_call):
     stock = yf.Ticker(ticker)
     opt = stock.option_chain(stock.options[1])
     
@@ -416,16 +370,11 @@ def options(ticker, price, range, put_call):
     elif put_call == "call":
         opt = pd.DataFrame().append(opt.calls)
 
-    #Grab inputted stock price. If no inputed stock price, use current stock price
-    if price == "":
-        stockSP = stock.info['currentPrice']
-    else:
-        stockSP = price
+    stockSP = stock.info['currentPrice']
 
     #Determine and display the calls that meet the criteria that is $5 within the current price
-    calls = opt.loc[((stockSP-range)<=opt['strike'])&((stockSP+range) >= opt['strike'])]
+    calls = opt.loc[((stockSP-range_length)<=opt['strike'])&((stockSP+range_length) >= opt['strike'])]
 
-    #Double check if this actually works
     return calls
 
 

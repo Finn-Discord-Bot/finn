@@ -16,6 +16,7 @@ session = cluster.connect('portfolios')  # select keyspace
 # Adds a dataframe straight to the portfolio
 def add_portfolio(portfolio_df, uuid: int, settledate: str):
     for ticker in portfolio_df.index:
+        remove_stock(uuid, ticker)
         add_stock(uuid, ticker, portfolio_df[ticker], settledate)
 
 
