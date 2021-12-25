@@ -14,7 +14,7 @@ def smart_weighted(ticker_list, start_date, end_date, option):
     elif option == 'RISKY':
         pass
     else:
-        return safe_method(ticker_list, start_date, end_date)
+        return generate_safe_portfolio(ticker_list, start_date, end_date, initial_capital)
 
 
 def safe_method(ticker_list, start_date, end_date):  
@@ -80,7 +80,7 @@ def safe_method(ticker_list, start_date, end_date):
     
     return portfolios
 
-def generate_portfolio(ticker_list, start_date, end_date, initial_capital):
+def generate_safe_portfolio(ticker_list, start_date, end_date, initial_capital):
     random_portfolios = safe_method(ticker_list, start_date, end_date)
     random_portfolios
     safest_portfolio = random_portfolios.iloc[random_portfolios.Volatility.idxmin()]

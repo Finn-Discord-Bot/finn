@@ -223,95 +223,129 @@ def company_info(ticker):
     market_cap = ticker.info['marketCap']
     return [location, industry, market_cap]
 
-def generate_portfolio(ticker_dict, userid):
-    portfolio = 
+def regenerate_portfolio(portfolio: dict):
+    last_tday = last_trading_day()
+    incep_dates = []
+    for ticker in portfolio:
+        incep_dates.append(portfolio[ticker][1])
+    earliest_date = sorted(incep_dates)[0]
+    pricing_data = yf.download(
+        tickers = " ".join(ticker for ticker in portfolio),
+        start=earliest_date,
+        end=last_tday,
+        interval = '1d',
+        group_by='ticker',
+        threads=True  
+    )
+    portfolio_df = pd.DataFrame()
+    portfolio_df["Dates"] = pd.date_range(start=earliest_date, end=last_tday, freq="B")
+    portfolio_df.set_index("Dates", inplace = True)
+
+    for ticker in portfolio:
+        portfolio_df[f'{ticker}_SHARES'] = 0
+        print(portfolio_df)
+        portfolio_df[f'{ticker}_SHARES'].loc[portfolio[ticker][1]:] += float(portfolio[ticker][0])
+        print(portfolio_df)
+        portfolio_df[f'{ticker}_CLOSE'] = pricing_data[ticker].Close
+        # portfolio_df.fillna(inplace=True)
+        portfolio_df[f'{ticker}_VALUE'] = portfolio_df[f'{ticker}_SHARES'] * portfolio_df[f'{ticker}_CLOSE']  
+    
+    portfolio_df.dropna(how='all', inplace=True)
+    print(portfolio_df)
+
+    
+    
+    
+        
+        
 
 
-# {'HOOD': [Decimal('1.12345'), '2021-21-24']}
+# {'HOOD': [Decimal('1.12345'), '2021-21-24'],
+# ,
+# ,
+# ,
+# ,
+# ,
+# }
 # print(get_portfolio(00000))
 
-def portfolio_graphs(ticker_list, start_date, end_date, weight_option, userid):
+def portfolio_graphs(portfolio: dict, userid: int):
+    return None
 
-    # Get valid ticker list
-    valid_tickers = valid_ticker_list(ticker_list)
+    # Get last trading day
+    latest_trading_day = last_trading_day()
 
-    if not valid_tickers:
-        print('Invalid tickers were inputted!')
-    elif len(valid_tickers) > 10:
-        print('Exceeded Maximum Number of Tickers!')
-    else:
+    # Create desired portfolio with ticker list
+    portfolio = regenerate_portfolio()
 
-        # Create desired portfolio with ticker list
-        portfolio = portfolio_maker(ticker_list, start_date, end_date, weight_option)
+    weight = weight_option.upper()
 
-        weight = weight_option.upper()
-
-        # Get monthly Data
-        monthly_data = portfolio.resample('MS').first()
-        
-        if weight == 'PRICE WEIGHTED':
-            
-            # Initiate plot
-            fig, ((ax1), (ax2)) = plt.subplot(2,1)
-            fig.set_size_inches(20,20)
-
-            fig.suptitle(f'{weight_option} Portfolio Returns: {start_date} to {end_date}')
-
-            ax1.plot(portfolio.index, portfolio['Price Weighted Index'])
-            ax1.set_title(f'Daily Portfolio Returns ({weight_option})')
-            ax1.set_xlable('Dates')
-            ax1.set_ylabel('Returns')
-            
-            ax2.plot(portfolio.index, monthly_data['Price Weighted Index'])
-            ax2.set_title(f'Monthly Portfolio Value ({weight_option})')
-            ax2.set_xlabel('Dates')
-            ax2.set_ylabel('Returns')
-
-            # Create png of graphs
-            plt.savefig(f'process/{userid}.png')
-
-        elif weight == 'MARKET WEIGHTED':
-
-            # Initiate plot
-            fig, ((ax1), (ax2)) = plt.subplot(2,1)
-            fig.set_size_inches(20,20)
-
-            fig.suptitle(f'{weight_option} Portfolio Returns: {start_date} to {end_date}')
-
-            ax1.plot(portfolio.index, portfolio['Market Weighted Index'])
-            ax1.set_title(f'Daily Portfolio Returns ({weight_option})')
-            ax1.set_xlable('Dates')
-            ax1.set_ylabel('Returns')
-            
-            ax2.plot(portfolio.index, monthly_data['Market Weighted Index'] )
-            ax2.set_title(f'Monthly Portfolio Value ({weight_option})')
-            ax2.set_xlabel('Dates')
-            ax2.set_ylabel('Returns')
-
-            # Create png of graphs
-            plt.savefig(f'process/{userid}.png')
-        
-        elif weight == 'SMART WEIGHTED':
-
-            # Initiate plot
-            fig, ((ax1), (ax2)) = plt.subplot(2,1)
-            fig.set_size_inches(20,20)
-
-            fig.suptitle(f'{weight_option} Portfolio Returns: {start_date} to {end_date}')
-
-            ax1.plot(portfolio.index, portfolio['Smart Weighted Index'])
-            ax1.set_title(f'Daily Portfolio Returns ({weight_option})')
-            ax1.set_xlable('Dates')
-            ax1.set_ylabel('Returns')
-            
-            ax2.plot(portfolio.index, monthly_data['Smart Weighted Index'])
-            ax2.set_title(f'Monthly Portfolio Value ({weight_option})')
-            ax2.set_xlabel('Dates')
-            ax2.set_ylabel('Returns')
-
-            # Create png of graphs
-            plt.savefig(f'process/{userid}.png')
+    # Get monthly Data
+    monthly_data = portfolio.resample('MS').first()
     
+    if weight == 'PRICE WEIGHTED':
+        
+        # Initiate plot
+        fig, ((ax1), (ax2)) = plt.subplot(2,1)
+        fig.set_size_inches(20,20)
+
+        fig.suptitle(f'{weight_option} Portfolio Returns: {start_date} to {end_date}')
+
+        ax1.plot(portfolio.index, portfolio['Price Weighted Index'])
+        ax1.set_title(f'Daily Portfolio Returns ({weight_option})')
+        ax1.set_xlable('Dates')
+        ax1.set_ylabel('Returns')
+        
+        ax2.plot(portfolio.index, monthly_data['Price Weighted Index'])
+        ax2.set_title(f'Monthly Portfolio Value ({weight_option})')
+        ax2.set_xlabel('Dates')
+        ax2.set_ylabel('Returns')
+
+        # Create png of graphs
+        plt.savefig(f'process/{userid}.png')
+
+    elif weight == 'MARKET WEIGHTED':
+
+        # Initiate plot
+        fig, ((ax1), (ax2)) = plt.subplot(2,1)
+        fig.set_size_inches(20,20)
+
+        fig.suptitle(f'{weight_option} Portfolio Returns: {start_date} to {end_date}')
+
+        ax1.plot(portfolio.index, portfolio['Market Weighted Index'])
+        ax1.set_title(f'Daily Portfolio Returns ({weight_option})')
+        ax1.set_xlable('Dates')
+        ax1.set_ylabel('Returns')
+        
+        ax2.plot(portfolio.index, monthly_data['Market Weighted Index'] )
+        ax2.set_title(f'Monthly Portfolio Value ({weight_option})')
+        ax2.set_xlabel('Dates')
+        ax2.set_ylabel('Returns')
+
+        # Create png of graphs
+        plt.savefig(f'process/{userid}.png')
+    
+    elif weight == 'SMART WEIGHTED':
+
+        # Initiate plot
+        fig, ((ax1), (ax2)) = plt.subplot(2,1)
+        fig.set_size_inches(20,20)
+
+        fig.suptitle(f'{weight_option} Portfolio Returns: {start_date} to {end_date}')
+
+        ax1.plot(portfolio.index, portfolio['Smart Weighted Index'])
+        ax1.set_title(f'Daily Portfolio Returns ({weight_option})')
+        ax1.set_xlable('Dates')
+        ax1.set_ylabel('Returns')
+        
+        ax2.plot(portfolio.index, monthly_data['Smart Weighted Index'])
+        ax2.set_title(f'Monthly Portfolio Value ({weight_option})')
+        ax2.set_xlabel('Dates')
+        ax2.set_ylabel('Returns')
+
+        # Create png of graphs
+        plt.savefig(f'process/{userid}.png')
+
 
 
 # Beta Value       

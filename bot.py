@@ -95,7 +95,8 @@ async def _lasttradingday(ctx: SlashContext):
     last_trade_day = last_trading_day()
     embed = discord.Embed(
         title="Last Trading Day",
-        description=last_trade_day)  
+        description=last_trade_day,
+        color = discord.Color.from_rgb(131, 214, 129))
     await ctx.send(embeds=[embed])
 
 
@@ -104,13 +105,31 @@ async def _help(ctx: SlashContext):
     embed = discord.Embed(
         title = "Commands",
         description = 
-        """/help - Provides a list of possible commands \n
-        /lasttradingday - Displays the last completed trading day \n 
-        /createportfolio - Command associated with portfolio creation \n 
-        /displayportfolio - Command associated with displaying portfolio \n 
-        /stockinfo - Displays an information preview of the specified ticker \n 
-        """) # FINISH THIS LATER WHEN ALL COMMANDS ARE DONE
+        """
+        You seem to need a bit of assistance! 
+        Don’t worry, grab some milk and cookies, sit back and relax. 
+        What do you need help with? \n 
+        ==========================================================
+        /help - Provides a list of possible commands \n """,
+        color=discord.Color.from_rgb(235, 168, 96)
+        )
+
+    embed.add_field(name ='Portfolio Commands', value = 
+    """\n /createportfolio - Command associated with portfolio creation \n 
+    /displayportfolio - Command associated with displaying portfolio \n""", inline=True)   
+
+    embed.add_field(name = 'Finance Commands', value = 
+    """\n /lasttradingday - Displays the last completed trading day \n
+    /stockinfo - Displays an information preview of the specified ticker \n""", inline=True)
+
+    embed.set_image(url='https://cdn.discordapp.com/attachments/846084093065953283/924129382090539038/IMG_0005.jpg') 
     await ctx.send(embeds=[embed])
+        
+        
+        
+        # FINISH THIS LATER WHEN ALL COMMANDS ARE DONE 
+        # MAKE HEADERS - Finance commands, stock commands, Portfolio commands, Misc Bot commands 
+    
 
 
 # User Input
@@ -177,18 +196,20 @@ async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: st
     await ctx.send(content=f"I got you, you said {portfoliotype, tickerlist, str(money)}!")
 
 @slash.slash(
-    name = "DisplayPortfolio",
+    name = "displayportfolio",
     description = "Command associated with displaying portfolio",
     guild_ids = guilds
 )
-async def _DisplayPortfolio(ctx: SlashContext):
+async def _displayportfolio(ctx: SlashContext):
     user_id = ctx.author.id
     portfolio_dict = get_portfolio(user_id)
+    print(portfolio_dict)
+    regenerate_portfolio(portfolio_dict)
     # #Get portfolio using user_id
     # ...
         
-    await ctx.send(file=discord.File(f'process/{user_id}.png'))
-    os.remove(f'process/{user_id}.png')
+    #await ctx.send(file=discord.File(f'process/{user_id}.png'))
+    #os.remove(f'process/{user_id}.png')
 
 
     # await ctx.send(content=f"I've caught your uuid in 4K: {user_id}!")
@@ -213,7 +234,7 @@ async def _StockInfo(ctx:SlashContext, ticker: str):
     response = discord.Embed(
         title = f"{ticker} Info",
         description = "Description",
-        colour = discord.Colour.blue()    
+        colour = discord.Color.from_rgb(235, 121, 96)    
     )
     
     data = stock_info(ticker)
