@@ -182,7 +182,7 @@ def market_weighted(ticker_list, start_date, end_date, starting_balance):
    
     return market_weighted_df
     
-def portfolio_maker(ticker_list, start_date, end_date, weight_option):
+def portfolio_maker(ticker_list, start_date, end_date, weight_option, money):
     
     # Get valid ticker list
     valid_tickers = valid_ticker_list(ticker_list)
@@ -199,13 +199,13 @@ def portfolio_maker(ticker_list, start_date, end_date, weight_option):
 
         # check weight option
         if option == 'PRICE WEIGHTED':
-            portfolio = equally_weighted_portfolio(ticker_list, start_date, end_date)
+            portfolio = equally_weighted_portfolio(money, ticker_list, start_date, end_date)
 
         elif option == 'MARKET WEIGHTED':
-            portfolio = market_weighted(ticker_list, start_date, end_date)
+            portfolio = market_weighted(ticker_list, start_date, end_date, money)
 
         else:
-            portfolio = smart_weighted(ticker_list, start_date, end_date, option)
+            portfolio = smart_weighted(ticker_list, start_date, end_date, option, money)
         
         if not portfolio:
             return None

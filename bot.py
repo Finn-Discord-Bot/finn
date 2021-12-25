@@ -306,7 +306,7 @@ async def _StockInfo(ctx:SlashContext, ticker: str):
     response.add_field(name='Last Trading Day Close', value=data['Last Trading Day Close'], inline=True)
     await ctx.send(embed=response)
 
-#slash command for stock history
+#slash command for stock history (HAVEN'T BEEN TESTED YET)
 @slash.slash(
     name = 'StockHistory',
     description = "Here is your stock's history."
@@ -339,7 +339,7 @@ async def _stockhistory(ctx: SlashContext, ticker: str, start_date: str, end_dat
     response.add_field(name="Stock Splits", value=data["Stock Splits"], inline=True)
     await ctx.send(embed=response)
 
-# slash command for options
+# slash command for options (HAVEN'T BEEN TESTED YET)
 @slash.slash(
     name = "Options",
     description = "Here is the preview of the options available for your stock",
@@ -382,14 +382,20 @@ async def _options(ctx:SlashContext, ticker: str, range_length: int, put_call: s
         colour = discord.Color.from_rgb(235, 121, 96)    
     )
     
-    data = options(ticker)
+    data = options(ticker, range_length, put_call):
     response.set_author(name="Finn Bot")
-    response.add_field(name='Beta', value=data['Beta'], inline=True)
-    response.add_field(name='STD', value=data['STD'], inline=True)
-    response.add_field(name='52Wk High', value=data['52Wk High'], inline=True)
-    response.add_field(name='52Wk Low', value=data['52Wk Low'], inline=True)
-    response.add_field(name='Last Trading Day Open', value=data['Last Trading Day Open'], inline=True)
-    response.add_field(name='Last Trading Day Close', value=data['Last Trading Day Close'], inline=True)
+    response.add_field(name='Contract Symbol', value=data['contractSymbol'], inline=True)
+    response.add_field(name='Last Trade Date', value=data['lastTradeDate'], inline=True)
+    response.add_field(name='Strike', value=data['strike'], inline=True)
+    response.add_field(name='Last Price', value=data['lastPrice'], inline=True)
+    response.add_field(name='Bid', value=data['bid'], inline=True)
+    response.add_field(name='Ask', value=data['ask'], inline=True)
+    response.add_field(name='Change', value=data['change'], inline=True)
+    response.add_field(name='Pct Change', value=data['percentChange'], inline=True)
+    response.add_field(name='Volume', value=data['volume'], inline=True)
+    response.add_field(name='Open Interest', value=data['openInterest'], inline=True)
+    response.add_field(name='Implied Volatility', value=data['impliedVolatility'], inline=True)
+    response.add_field(name='In the money?', value=data['inTheMoney'], inline=True)
     await ctx.send(embed=response)
 
 
@@ -408,7 +414,27 @@ async def _options(ctx:SlashContext, ticker: str, range_length: int, put_call: s
         )
     ]
 )
-#async def _sharperatio
+async def _sharperatio(ctx:SlashContext, ticker:str, start_date:str, end_date:str):
+    ticker = ticker.upper()
+    response = discord.Embed(
+        title = f"{ticker} Sharpe Ratio",
+        description = "Command that provides the sharpe ratio of a stock",
+        colour = discord.Color.from_rgb(235, 121, 96)
+    )
+    response.set_author(name='Finn Bot')
+    response.add_field(name=)
+
+    #await ctx.send(sharpe_ratio(ticker, start_date, end_date))
+    
+    data = stock_info(ticker)
+    response.set_author(name="Finn Bot")
+    response.add_field(name='Beta', value=data['Beta'], inline=True)
+    response.add_field(name='STD', value=data['STD'], inline=True)
+    response.add_field(name='52Wk High', value=data['52Wk High'], inline=True)
+    response.add_field(name='52Wk Low', value=data['52Wk Low'], inline=True)
+    response.add_field(name='Last Trading Day Open', value=data['Last Trading Day Open'], inline=True)
+    response.add_field(name='Last Trading Day Close', value=data['Last Trading Day Close'], inline=True)
+    await ctx.send(embed=response)
 
 # Functions from the finance file 
 

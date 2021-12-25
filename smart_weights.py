@@ -8,7 +8,7 @@ import random
 
 from finance_functions import *
 
-def smart_weighted(ticker_list, start_date, end_date, option):
+def smart_weighted(ticker_list, start_date, end_date, option, initial_capital):
     if option not in ('RISKY', 'SAFE'):
         return None
     elif option == 'RISKY':
