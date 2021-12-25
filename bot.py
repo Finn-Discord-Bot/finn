@@ -98,11 +98,18 @@ async def _lasttradingday(ctx: SlashContext):
         description=last_trade_day)  
     await ctx.send(embeds=[embed])
 
+
 @slash.slash(name="help", description = "Provides a list of possible commands")
 async def _help(ctx: SlashContext):
     embed = discord.Embed(
         title = "Commands",
-        description = "[put commands here]") # FINISH THIS LATER WHEN ALL COMMANDS ARE DONE
+        description = 
+        """/help - Provides a list of possible commands \n
+        /lasttradingday - Displays the last completed trading day \n 
+        /createportfolio - Command associated with portfolio creation \n 
+        /displayportfolio - Command associated with displaying portfolio \n 
+        /stockinfo - Displays an information preview of the specified ticker \n 
+        """) # FINISH THIS LATER WHEN ALL COMMANDS ARE DONE
     await ctx.send(embeds=[embed])
 
 
@@ -176,10 +183,14 @@ async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: st
 )
 async def _DisplayPortfolio(ctx: SlashContext):
     user_id = ctx.author.id
+    portfolio_dict = get_portfolio(user_id)
     # #Get portfolio using user_id
     # ...
+        
     await ctx.send(file=discord.File(f'process/{user_id}.png'))
     os.remove(f'process/{user_id}.png')
+
+
     # await ctx.send(content=f"I've caught your uuid in 4K: {user_id}!")
 
 

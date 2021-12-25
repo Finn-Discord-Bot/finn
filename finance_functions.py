@@ -198,7 +198,7 @@ def portfolio_maker(ticker_list, start_date, end_date, weight_option):
 
         # check weight option
         if option == 'PRICE WEIGHTED':
-            portfolio = make_price_weighted_portfolio(ticker_list, start_date, end_date)
+            portfolio = equally_weighted_portfolio(ticker_list, start_date, end_date)
 
         elif option == 'MARKET WEIGHTED':
             portfolio = market_weighted(ticker_list, start_date, end_date)
@@ -223,6 +223,12 @@ def company_info(ticker):
     market_cap = ticker.info['marketCap']
     return [location, industry, market_cap]
 
+def generate_portfolio(ticker_dict, userid):
+    portfolio = 
+
+
+# {'HOOD': [Decimal('1.12345'), '2021-21-24']}
+# print(get_portfolio(00000))
 
 def portfolio_graphs(ticker_list, start_date, end_date, weight_option, userid):
 
@@ -305,6 +311,7 @@ def portfolio_graphs(ticker_list, start_date, end_date, weight_option, userid):
 
             # Create png of graphs
             plt.savefig(f'process/{userid}.png')
+    
 
 
 # Beta Value       
