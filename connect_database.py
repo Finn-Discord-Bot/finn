@@ -15,9 +15,9 @@ session = cluster.connect('portfolios')  # select keyspace
 
 # Adds a dataframe straight to the portfolio
 def add_portfolio(portfolio_df, uuid: int, settledate: str):
+    remove_table(uuid)
     for ticker in portfolio_df.index:
-        remove_stock(uuid, ticker)
-        add_stock(uuid, ticker, portfolio_df[ticker], settledate)
+        add_stock(uuid, ticker, float(portfolio_df.loc[ticker]), settledate)
 
 
 # Adds a stock to a user's portfolio
@@ -40,6 +40,11 @@ def remove_stock(uuid: int, ticker: str):
                     WHERE ticker = '{ticker}'
                     """)
 
+
+def remove_table(uuid: int):
+    session.execute(f"""
+                    DROP TABLE IF EXISTS user{uuid}
+                    """)
 
 # Pull Portfolio from user
 def get_portfolio(uuid: int) -> dict:

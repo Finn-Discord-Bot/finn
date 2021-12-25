@@ -4,7 +4,6 @@ from discord import guild
 from discord_slash import SlashCommand, SlashContext
 from discord_slash.model import GuildPermissionsData
 from discord_slash.utils.manage_commands import create_choice, create_option
-import datetime
 import json
 import os
 import asyncio
@@ -35,12 +34,12 @@ guilds = []
 def get_guilds():
     return [g.id for g in bot.guilds]
 
-dmfailed = discord.Embed(
-    title="DM Failed",
-    description='',
-    timestamp=datetime.utcnow(),
-    color=discord.Color.from_rgb(240, 71, 71)
-)
+# dmfailed = discord.Embed(
+#     title="DM Failed",
+#     description='',
+#     timestamp=datetime.utcnow(),
+#     color=discord.Color.from_rgb(240, 71, 71)
+# )
 
 
 @bot.command()
@@ -48,13 +47,13 @@ async def ping(ctx):
     await ctx.send('pong')
 
 
-@bot.command()
-async def pingdm(ctx):
-    try:
-        await ctx.author.send('pong')
-        await ctx.message.add_reaction(check_reaction)
-    except discord.Forbidden:
-        await ctx.send(embed=dmfailed)
+# @bot.command()
+# async def pingdm(ctx):
+#     try:
+#         await ctx.author.send('pong')
+#         await ctx.message.add_reaction(check_reaction)
+#     except discord.Forbidden:
+#         await ctx.send(embed=dmfailed)
 
 # # Take in user input and store it
 # @bot.command()
@@ -112,12 +111,33 @@ async def _Help(ctx: SlashContext):
         color=discord.Color.from_rgb(235, 168, 96)
         )
 
+
+    embed.add_field(name = 'Stock Commands', value = 
+    """
+    /companyinfo - Provides the location, industry, and market capitalization of a given stock \n
+    /stockinfo - Displays an information preview of a specified ticker \n
+    /stockhistory - Provides stock history of a given stock. History includes opening and closing prices, and stock splits. \n
+
+    """, inline=True)
+
+
     embed.add_field(name ='Portfolio Commands', value = 
-    """/createportfolio - Creates a portfolio \n /displayportfolio - Displays a portfolio \n
+    """
+    /createportfolio - Creates a portfolio \n 
+    /displayportfolio - Displays a portfolio with its respective graph \n
+    /priceweightedindex - Creates a priceweighted portfolio \n
+
     """, inline=True)   
 
+
     embed.add_field(name = 'Finance Commands', value = 
-    """/lasttradingday - Displays the last completed trading day \n /stockinfo - Displays an information preview of the specified ticker \n""", inline=True)
+    """
+    /lasttradingday - Displays the last completed trading day \n 
+    /sharperatio - Provides the sharpe ratio of a stock \n
+    /options - Displays either put or call options of a stock \n 
+
+    """, inline=True)
+
 
     embed.set_image(url='https://cdn.discordapp.com/attachments/846084093065953283/924129382090539038/IMG_0005.jpg') 
     await ctx.send(embeds=[embed])
@@ -132,7 +152,7 @@ async def _Help(ctx: SlashContext):
 # User Input
 @slash.slash(
     name = "testinput",
-    description = "this just just a test but with *-+= inputs =+-*",
+    description = "this just a test but with *-+= inputs =+-*",
     options=[
         create_option(
             name="ticker_list",
@@ -213,15 +233,16 @@ async def _PriceWeightedIndex(ctx: SlashContext, tickerlist: str):
 )
 async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: str, money: int):
     user_id = ctx.author.id
+    temp = []
     temp = tickerlist.split()
     # portfolio should be a tuple with (actualportfolio, date)
-    portfolio = portfolio_maker(tickerlist, portfoliotype, money)
-    date = all_data[1]
-    actualportfolio = all_data[0]
-    add_portfolio(portfolio, user_id, date)
+    portfolio = portfolio_maker(temp, portfoliotype, money)
+    date = portfolio[1]
+    actualportfolio = portfolio[0]
+    add_portfolio(actualportfolio, user_id, date)
     color=discord.Color.from_rgb(207, 189, 255)
+    # await ctx.send(content=f"I got you, you said {portfoliotype, tickerlist, str(money)}!")
     
-    #await ctx.send(content=f"I got you, you said {portfoliotype, tickerlist, str(money)}!")
 
 
 @slash.slash(
@@ -266,6 +287,7 @@ async def _CompanyInfo(ctx: SlashContext, ticker: str):
 async def _Displayportfolio(ctx: SlashContext):
     user_id = ctx.author.id
     portfolio_dict = get_portfolio(user_id)
+    print(portfolio_dict)
     data = portfolio_graphs(portfolio_dict, user_id)
     initial_investment = data[0]
     current_value = data[1]
@@ -275,7 +297,7 @@ async def _Displayportfolio(ctx: SlashContext):
     
     embed = discord.Embed(
         title = "Portfolio Returns",
-        description = "Here's your graph bro.",
+        description = "Here's your graph!",
         colour = discord.Color.from_rgb(187, 242, 229)    
     )
     embed.set_author(name ='Finn Bot')

@@ -2,9 +2,8 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 import numpy as npf
 import pandas as pd
-import datetime 
-from datetime import date, datetime, timedelta, timezone
-from smart_weights import *
+import datetime
+from smart_weights import * 
 
 # Variables
 # Will have to globalize the yfinance data too cause having to constantly do api calls is going to make our code really slow
@@ -18,22 +17,22 @@ global stock_info
 
 
 def last_trading_day():
-    now = datetime.now(timezone(timedelta(hours=-5), 'EST'))
+    rightnow = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5), 'EST'))
 
     # US Markets close at 4pm, but afterhours trading ends at 8pm.
     # yFinance stubbornly only gives the day's data after 8pm, so we will wait until 9pm to pull data from
     # the current day.
-    market_close = now.replace(hour=21, minute=0, second=0, microsecond=0)
-    if now < market_close:
+    market_close = rightnow.replace(hour=21, minute=0, second=0, microsecond=0)
+    if rightnow < market_close:
         DELTA = 1
     # If it is saturday or sunday
-    elif now.weekday() >= 5:
+    elif rightnow.weekday() >= 5:
         DELTA = 1
     else:
         DELTA = 0
         
-    start_date = (datetime.now() - timedelta(days=15)).strftime("%Y-%m-%d")
-    end_date = (datetime.now() - pd.tseries.offsets.BDay(DELTA)).strftime("%Y-%m-%d")
+    start_date = (datetime.datetime.now() - datetime.timedelta(days=15)).strftime("%Y-%m-%d")
+    end_date = (datetime.datetime.now() - pd.tseries.offsets.BDay(DELTA)).strftime("%Y-%m-%d")
     MarketIndex = "^GSPC" # We can use the S&P 500's data to see the last day where we have data
 
     market_hist = yf.Ticker(MarketIndex).history(start=start_date, end=end_date).filter(like="Close").dropna()   
@@ -122,10 +121,10 @@ class Portfolio:
 
 
 def stock_history(ticker, start_date, end_date):
-    current_date = date.today()
+    current_date = datetime.date.today()
     stock = yf.Ticker(ticker)
     if start_date == "" or end_date == "":
-        stock_history = stock.history(start = date.today, end = date.today) 
+        stock_history = stock.history(start = datetime.date.today, end = datetime.date.today) 
     else:
         stock_history = stock.history(start = start_date, end = end_date) 
     return stock_history
@@ -185,18 +184,19 @@ def portfolio_maker(ticker_list, weight_option, starting_balance):
     else:
         # check weight option
         if weight_option == 'PRICE WEIGHTED':
-            portfolio = price_weighted(ticker_list,starting_balance,prices_list)
+            portfolio = price_weighted(valid_tickers,starting_balance,prices_list)
 
         elif weight_option == 'MARKET WEIGHTED':
-            portfolio = market_weighted(ticker_list,starting_balance,prices_list)
+            portfolio = market_weighted(valid_tickers,starting_balance,prices_list)
 
         else:
-            portfolio = smart_weighted(ticker_list, weight_option)
+            portfolio = smart_weighted(valid_tickers, weight_option)
         
-        if not portfolio:
-            return None
-        else:
-            pass
+        # if not portfolio.empty():
+        #     return None
+        # else:
+        #     pass
+
         return (portfolio,last_day)
 
 
@@ -242,8 +242,10 @@ def regenerate_portfolio(portfolio: dict):
     # Find total investment (the amount of money put in)
     investment = 0
     for ticker in portfolio:
-        investment += pricing_data[ticker].loc[portfolio[ticker][1]] * portfolio[ticker][0]
-        
+        close = pricing_data[ticker].loc[portfolio[ticker][1]].Close
+        if np.isnan(close):
+            close = 0
+        investment += close * float(portfolio[ticker][0])
     for ticker in portfolio:
         portfolio_df[f'{ticker}_SHARES'] = 0
         portfolio_df[f'{ticker}_SHARES'].loc[portfolio[ticker][1]:] += float(portfolio[ticker][0])
@@ -277,7 +279,7 @@ def portfolio_graphs(portfolio: dict, userid: int):
     data = regenerate_portfolio(portfolio)
     portfolio_df = data[0]
     initial_investment = data[1]
-    print(portfolio_df)
+    print(initial_investment)
 
     # Initiate plot
 
@@ -388,10 +390,9 @@ def correlation(ticker1, ticker2):
     
     # check ticker validity, and proceeding  
     if ticker1_info['regularMarketPrice'] != None or ticker2_info['regularMarketPrice'] != None:
-        from datetime import datetime
         start_date = '1900-01-01'
-        now = datetime.now()
-        end_date = now.strftime("%Y-%m-%d")
+        rightnow = datetime.datetime.now()
+        end_date = rightnow.strftime("%Y-%m-%d")
         un_ticker1_hist = ticker1.history(start = start_date, close = end_date)
         un_ticker2_hist = ticker2.history(start = start_date, close = end_date)
         if un_ticker1_hist.index[0].strftime("%Y-%m-%d") > un_ticker2_hist.index[0].strftime("%Y-%m-%d"):
