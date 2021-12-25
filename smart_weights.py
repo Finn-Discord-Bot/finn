@@ -87,7 +87,7 @@ def generate_safe_portfolio(ticker_list, start_date, end_date, initial_capital):
 
     pd.DataFrame(safest_portfolio)
     
-    date = last_trading_day
+    date = last_trading_day()
     
     current_day = datetime.strptime(date, "%Y-%m-%d")
 

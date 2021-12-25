@@ -210,8 +210,8 @@ def portfolio_maker(ticker_list, start_date, end_date, weight_option, money):
         if not portfolio:
             return None
         else:
-            pass
-        return True
+            # portfolio should be a tuple with (actualportfolio, date)
+            return portfolio
 
 
 # Earnings per Share/ Return on equity?

@@ -46,31 +46,36 @@ def create_price_list(ticker_list):
                     threads = True
                 )
     last_row = ticker_hist['Close'].iloc[-1]
+    last_date = last_row.index[0]
     for x in new_ticker_list:
         price_list.append(last_row[x])
-    return price_list
+    return (price_list, last_date)
 
 
-tick_list = sorted(valid_ticker_list(["GOOG", "AAPL", "TSLA", "baofisebf"]))
+tick_list= sorted(valid_ticker_list(["GOOG", "AAPL", "TSLA", "baofisebf"]))
+
 temp = create_price_list(tick_list)
+priced_list = temp[0]
+last_day = temp[1]
 
-def price_weighted(investment, ticker_list,price_list):
+def price_weighted(starting_balance, ticker_list, price_list):
 
     # Create DataFrame
-    pw_portfolio = pd.DataFrame()
+    pw_portfolio = pd.DataFrame(index = ticker_list)
+    pw_portfolio["Shares"] = 0
     num_tickers = len(ticker_list)
-    value_per_share = investment/num_tickers
+    value_per_share = starting_balance/num_tickers
     
     # Add Close price columns for each stock
-    for i in range(len(ticker_list)):
-        pw_portfolio[f'{ticker_list[i]} Shares'] = price_list[i]*value_per_share
     
-    # Get Price Weighted Index
-    pw_portfolio['Price Weighted Index'] = (pw_portfolio.sum(axis=1))/num_tickers
+    for i in range(len(ticker_list)):
+        
+        pw_portfolio['Shares'].loc[ticker_list[i]] = value_per_share/price_list[i]
+    
 
     return pw_portfolio
 
-
+print(price_weighted(10000, tick_list,priced_list))
 
 def market_weighted(ticker_list, starting_balance, price_list):
     
@@ -97,8 +102,8 @@ def market_weighted(ticker_list, starting_balance, price_list):
 
 print(tick_list)
     
-print(market_weighted(tick_list,10000, temp))
-print(price_weighted(tick_list,10000, temp))
+#print(market_weighted(tick_list,10000, priced_list))
+
 #good
 def portfolio_maker(ticker_list, weight_option, investment):
     

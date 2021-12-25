@@ -148,6 +148,27 @@ async def _help(ctx: SlashContext):
 async def _testinput(ctx: SlashContext, ticker_list: str):
     await ctx.send(content=f"I got you, you said {ticker_list}!")
 
+@slash.slash(
+    name = 'PriceWeightedIndex',
+    description = 'Command that creates a price weighted portfolio',
+    guild_ids = guilds,
+    options = [
+        create_option(
+            name="tickerlist",
+            description="Enter a space-seperated list of tickers.",
+            option_type=3,
+            required=True
+        )
+    ]
+)
+async def _priceWeightedIndex(ctx: SlashContext, tickerlist: str):
+    temp = []
+    temp = tickerlist.split()
+    pw_portfolio = price_weighted(tickerlist)
+    color=discord.Color.from_rgb(224, 255, 201)
+
+    await ctx.send(content='hi')
+
     
 
 @slash.slash(
@@ -155,6 +176,7 @@ async def _testinput(ctx: SlashContext, ticker_list: str):
     description = "Command associated with portfolio creation",
     guild_ids = guilds,
     options=[
+       
         create_option(
             name="portfoliotype",
             description="What type of portfolio would you like to create?",
@@ -194,11 +216,15 @@ async def _testinput(ctx: SlashContext, ticker_list: str):
     ]
 )
 async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: str, money: int):
+    user_id = ctx.author.id
     temp = []
     temp = tickerlist.split()
-    portfolio_maker(temp, portfoliotype, money)
+    # portfolio should be a tuple with (actualportfolio, date)
+    portfolio = portfolio_maker(tickerlist, portfoliotype, money)
+    #
+    add_portfolio(portfolio, user_id, settledate=...)
     color=discord.Color.from_rgb(207, 189, 255)
-
+    
     await ctx.send(content=f"I got you, you said {portfoliotype, tickerlist, str(money)}!")
 
 
@@ -400,7 +426,7 @@ async def _options(ctx:SlashContext, ticker: str, range_length: int, put_call: s
 
 
 
-# slash command for sharpe ratio
+# slash command for sharpe ratio (not tested)
 @slash.slash(
     name = "sharperatio"
     description = "Command that provides the sharpe ratio of a stock"
@@ -421,20 +447,55 @@ async def _sharperatio(ctx:SlashContext, ticker:str, start_date:str, end_date:st
         description = "Command that provides the sharpe ratio of a stock",
         colour = discord.Color.from_rgb(235, 121, 96)
     )
+    ratio = sharpe_ratio(ticker, start_date, end_date)
     response.set_author(name='Finn Bot')
-    response.add_field(name=)
-
-    #await ctx.send(sharpe_ratio(ticker, start_date, end_date))
-    
-    data = stock_info(ticker)
-    response.set_author(name="Finn Bot")
-    response.add_field(name='Beta', value=data['Beta'], inline=True)
-    response.add_field(name='STD', value=data['STD'], inline=True)
-    response.add_field(name='52Wk High', value=data['52Wk High'], inline=True)
-    response.add_field(name='52Wk Low', value=data['52Wk Low'], inline=True)
-    response.add_field(name='Last Trading Day Open', value=data['Last Trading Day Open'], inline=True)
-    response.add_field(name='Last Trading Day Close', value=data['Last Trading Day Close'], inline=True)
+    response.add_field(name='Sharpe Ratio'), value = ratio)
     await ctx.send(embed=response)
+
+# slash command for correlation (not tested)
+@slash.slash(
+    name = "correlation"
+    description = "Command that returns the correlation of two stocks"
+    guild_ids = guilds,
+    options = [
+        create_option(
+            name = "ticker1",
+            description = "What Ticker would you like to search?",
+            required = True,
+            option_type = 3
+        ),
+        create_option(
+            name = "ticker2",
+            description = "What Ticker would you like to search?",
+            required=True,
+            option_type = 3
+        )
+    ]
+)
+async def _correlation(ctx:SlashContext, ticker1: str, ticker2: str):
+    ticker1 = ticker1.upper()
+    ticker2 = ticker2.upper()
+    response = discord.Embed(
+        title = f"{ticker1} and {ticker2} Info",
+        description = ""
+    )
+
+
+       # description = "Description",
+        #colour = discord.Color.from_rgb(235, 121, 96)    
+    #)
+    
+    #data = stock_info(ticker)
+    #response.set_author(name="Finn Bot")
+    #response.add_field(name='Beta', value=data['Beta'], inline=True)
+    #response.add_field(name='STD', value=data['STD'], inline=True)
+    #response.add_field(name='52Wk High', value=data['52Wk High'], inline=True)
+    #response.add_field(name='52Wk Low', value=data['52Wk Low'], inline=True)
+    #response.add_field(name='Last Trading Day Open', value=data['Last Trading Day Open'], inline=True)
+    #response.add_field(name='Last Trading Day Close', value=data['Last Trading Day Close'], inline=True)
+    #await ctx.send(embed=response)
+
+
 
 # Functions from the finance file 
 
