@@ -51,7 +51,7 @@ def create_price_list(ticker_list):
     return price_list
 
 
-tick_list = valid_ticker_list(["SPY", "AAPL", "TSLA", "baofisebf"])
+tick_list = sorted(valid_ticker_list(["GOOG", "AAPL", "TSLA", "baofisebf"]))
 temp = create_price_list(tick_list)
 
 def price_weighted(investment, ticker_list,price_list):
@@ -77,8 +77,8 @@ def market_weighted(ticker_list, starting_balance, price_list):
     stock_dict = {}
     totalMarketCap = 0
     for i in range(len(ticker_list)):
-        stock_dict[ticker_list[i]] = yf.Ticker(ticker_list[i])
-        stock_dict[f"{ticker_list[i]} Shares Outstanding"] = stock_dict[ticker_list[i]].info["sharesOutstanding"]
+        info = yf.Ticker(ticker_list[i]).info
+        stock_dict[f"{ticker_list[i]} Shares Outstanding"] = info["sharesOutstanding"]
         stock_dict[f"{ticker_list[i]} Market Capitalization"] = stock_dict[f"{ticker_list[i]} Shares Outstanding"] * price_list[i]
         totalMarketCap += stock_dict[f"{ticker_list[i]} Market Capitalization"]
     
@@ -94,9 +94,11 @@ def market_weighted(ticker_list, starting_balance, price_list):
         market_weighted_df.loc[ticker_list[i],"Shares"] = (stock_dict[f"{ticker_list[i]} Market Capitalization Percent"] * starting_balance) / price_list[i]
    
     return market_weighted_df
-    
-print(market_weighted(['AAPL', 'SPY', 'TSLA' ],10000, [176.27999877929688, 470.6000061035156, 1067.0]))
 
+print(tick_list)
+    
+print(market_weighted(tick_list,10000, temp))
+print(price_weighted(tick_list,10000, temp))
 #good
 def portfolio_maker(ticker_list, weight_option, investment):
     
