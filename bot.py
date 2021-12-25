@@ -83,7 +83,7 @@ async def pingdm(ctx):
 
 # Slash Commands
 @slash.slash(name="ping", description="Ping command")
-async def _ping(ctx: SlashContext):
+async def _Ping(ctx: SlashContext):
     embed = discord.Embed(
         title="embed test",
         description = "this is just a test")  
@@ -91,7 +91,7 @@ async def _ping(ctx: SlashContext):
 
 
 @slash.slash(name="lasttradingday", description="Displays the last completed trading day")
-async def _lasttradingday(ctx: SlashContext):
+async def _Lasttradingday(ctx: SlashContext):
     last_trade_day = last_trading_day()
     embed = discord.Embed(
         title="Last Trading Day",
@@ -101,27 +101,23 @@ async def _lasttradingday(ctx: SlashContext):
 
 
 @slash.slash(name="help", description = "Provides a list of possible commands")
-async def _help(ctx: SlashContext):
+async def _Help(ctx: SlashContext):
     embed = discord.Embed(
         title = "Commands",
         description = 
         """
-        You seem to need a bit of assistance! 
-        Don’t worry, grab some milk and cookies, sit back and relax. 
-        What do you need help with? :) \n 
+        You seem to need a bit of assistance! Don't worry, grab some milk and cookies, sit back and relax. What do you need help with? :) \n 
         ==========================================
         \n /help - Provides a list of possible commands \n """,
         color=discord.Color.from_rgb(235, 168, 96)
         )
 
     embed.add_field(name ='Portfolio Commands', value = 
-    """/createportfolio - Creates a portfolio \n 
-    /displayportfolio - Displays a portfolio \n
+    """/createportfolio - Creates a portfolio \n /displayportfolio - Displays a portfolio \n
     """, inline=True)   
 
     embed.add_field(name = 'Finance Commands', value = 
-    """/lasttradingday - Displays the last completed trading day \n
-    /stockinfo - Displays an information preview of the specified ticker \n""", inline=True)
+    """/lasttradingday - Displays the last completed trading day \n /stockinfo - Displays an information preview of the specified ticker \n""", inline=True)
 
     embed.set_image(url='https://cdn.discordapp.com/attachments/846084093065953283/924129382090539038/IMG_0005.jpg') 
     await ctx.send(embeds=[embed])
@@ -145,11 +141,11 @@ async def _help(ctx: SlashContext):
             required=True)],
     guild_ids = guilds
 )
-async def _testinput(ctx: SlashContext, ticker_list: str):
+async def _Testinput(ctx: SlashContext, ticker_list: str):
     await ctx.send(content=f"I got you, you said {ticker_list}!")
 
 @slash.slash(
-    name = 'PriceWeightedIndex',
+    name = 'priceWeightedIndex',
     description = 'Command that creates a price weighted portfolio',
     guild_ids = guilds,
     options = [
@@ -161,7 +157,7 @@ async def _testinput(ctx: SlashContext, ticker_list: str):
         )
     ]
 )
-async def _priceWeightedIndex(ctx: SlashContext, tickerlist: str):
+async def _PriceWeightedIndex(ctx: SlashContext, tickerlist: str):
     temp = []
     temp = tickerlist.split()
     pw_portfolio = price_weighted(tickerlist)
@@ -217,21 +213,21 @@ async def _priceWeightedIndex(ctx: SlashContext, tickerlist: str):
 )
 async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: str, money: int):
     user_id = ctx.author.id
-    temp = []
     temp = tickerlist.split()
     # portfolio should be a tuple with (actualportfolio, date)
     portfolio = portfolio_maker(tickerlist, portfoliotype, money)
-    #
-    add_portfolio(portfolio, user_id, settledate=...)
+    date = all_data[1]
+    actualportfolio = all_data[0]
+    add_portfolio(portfolio, user_id, date)
     color=discord.Color.from_rgb(207, 189, 255)
     
-    await ctx.send(content=f"I got you, you said {portfoliotype, tickerlist, str(money)}!")
+    #await ctx.send(content=f"I got you, you said {portfoliotype, tickerlist, str(money)}!")
 
 
 @slash.slash(
     name = "companyinfo",
     description = "Command that provides the location, industry, and market capitalization of a given stock",
-    guild_ids = guilds    
+    guild_ids = guilds,    
     options = [
         create_option(
             name = "ticker",
@@ -242,7 +238,7 @@ async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: st
     ]   
 )
     
-async def _companyInfo(ctx: SlashContext, ticker: str):
+async def _CompanyInfo(ctx: SlashContext, ticker: str):
     ticker = ticker.upper()
     comp_info = company_info(ticker)
     location = comp_info[0]
@@ -250,8 +246,8 @@ async def _companyInfo(ctx: SlashContext, ticker: str):
     market_cap = comp_info[2]
 
     embed = discord.Embed(
-        title = f'Company Information for {ticker}'
-        description = 'The location of the company, industry of the company and its market capitalization.'
+        title = f'Company Information for {ticker}',
+        description = 'The location of the company, industry of the company and its market capitalization.',
         color=discord.Color.from_rgb(255, 207, 233)
     )
     embed.set_author(name = 'Finn Bot')
@@ -267,7 +263,7 @@ async def _companyInfo(ctx: SlashContext, ticker: str):
     description = "Command associated with displaying portfolio",
     guild_ids = guilds
 )
-async def _displayportfolio(ctx: SlashContext):
+async def _Displayportfolio(ctx: SlashContext):
     user_id = ctx.author.id
     portfolio_dict = get_portfolio(user_id)
     data = portfolio_graphs(portfolio_dict, user_id)
@@ -296,7 +292,7 @@ async def _displayportfolio(ctx: SlashContext):
 
 # slash command for stock info
 @slash.slash(
-    name = "StockInfo",
+    name = "stockInfo",
     description = "Here is the preview of the specified ticker.",
     guild_ids = guilds,
     options = [
@@ -310,11 +306,12 @@ async def _displayportfolio(ctx: SlashContext):
             name = "price",
             description = "What price would you like to search?",
             required=True,
+            option_type = 4
             
         )
     ]
 )
-async def _StockInfo(ctx:SlashContext, ticker: str):
+async def _StockInfo(ctx:SlashContext, ticker: str, price:int):
     ticker = ticker.upper()
     response = discord.Embed(
         title = f"{ticker} Info",
@@ -334,8 +331,8 @@ async def _StockInfo(ctx:SlashContext, ticker: str):
 
 #slash command for stock history (HAVEN'T BEEN TESTED YET)
 @slash.slash(
-    name = 'StockHistory',
-    description = "Here is your stock's history."
+    name = 'stockhistory',
+    description = "Here is your stock's history.",
     guild_ids = guilds,
     options = [
         create_option(
@@ -346,7 +343,7 @@ async def _StockInfo(ctx:SlashContext, ticker: str):
         )
     ]
 )
-async def _stockhistory(ctx: SlashContext, ticker: str, start_date: str, end_date: str):
+async def _StockHistory(ctx: SlashContext, ticker: str, start_date: str, end_date: str):
     ticker = ticker.upper() 
     response = discord.Embed(
         title = f"{ticker} History",
@@ -367,7 +364,7 @@ async def _stockhistory(ctx: SlashContext, ticker: str, start_date: str, end_dat
 
 # slash command for options (HAVEN'T BEEN TESTED YET)
 @slash.slash(
-    name = "Options",
+    name = "options",
     description = "Here is the preview of the options available for your stock",
     guild_ids = guilds,
     options = [
@@ -379,28 +376,30 @@ async def _stockhistory(ctx: SlashContext, ticker: str, start_date: str, end_dat
         ),
 
         create_option(
-            name = "Range",
+            name = "range",
             description = "What range are you looking in?",
-            required = True
+            required = True,
             option_type = 4
         ),
-
         create_option(
-            name = "Put/Call",
+            name = "put_or_call",
             description = "Are you looking for a put or call option?",
-            required = True
+            required = True,
+            option_type = 3,
             choices = [
                 create_choice(
-                    name = "Put",
+                    name = "put",
                     value = "put"
                 ),
                 create_choice(
-                    name = "Call",
+                    name = "call",
                     value = "call"
-        )        
+                )        
+            ]
+        )
     ]
 )
-async def _options(ctx:SlashContext, ticker: str, range_length: int, put_call: str):
+async def _Options(ctx:SlashContext, ticker: str, range: int, put_or_call: str):
     ticker = ticker.upper()
     response = discord.Embed(
         title = f"{ticker} Info",
@@ -408,7 +407,7 @@ async def _options(ctx:SlashContext, ticker: str, range_length: int, put_call: s
         colour = discord.Color.from_rgb(235, 121, 96)    
     )
     
-    data = options(ticker, range_length, put_call):
+    data = options(ticker, range_length, put_call)
     response.set_author(name="Finn Bot")
     response.add_field(name='Contract Symbol', value=data['contractSymbol'], inline=True)
     response.add_field(name='Last Trade Date', value=data['lastTradeDate'], inline=True)
@@ -428,9 +427,9 @@ async def _options(ctx:SlashContext, ticker: str, range_length: int, put_call: s
 
 # slash command for sharpe ratio (not tested)
 @slash.slash(
-    name = "sharperatio"
-    description = "Command that provides the sharpe ratio of a stock"
-    guild_ids = guilds 
+    name = "sharperatio",
+    description = "Command that provides the sharpe ratio of a stock",
+    guild_ids = guilds,
     options = [
         create_option(
             name = "ticker",
@@ -440,7 +439,7 @@ async def _options(ctx:SlashContext, ticker: str, range_length: int, put_call: s
         )
     ]
 )
-async def _sharperatio(ctx:SlashContext, ticker:str, start_date:str, end_date:str):
+async def _Sharperatio(ctx:SlashContext, ticker:str, start_date:str, end_date:str):
     ticker = ticker.upper()
     response = discord.Embed(
         title = f"{ticker} Sharpe Ratio",
@@ -449,51 +448,39 @@ async def _sharperatio(ctx:SlashContext, ticker:str, start_date:str, end_date:st
     )
     ratio = sharpe_ratio(ticker, start_date, end_date)
     response.set_author(name='Finn Bot')
-    response.add_field(name='Sharpe Ratio'), value = ratio)
+    response.add_field(name='Sharpe Ratio', value = ratio)
     await ctx.send(embed=response)
 
 # slash command for correlation (not tested)
-@slash.slash(
-    name = "correlation"
-    description = "Command that returns the correlation of two stocks"
-    guild_ids = guilds,
-    options = [
-        create_option(
-            name = "ticker1",
-            description = "What Ticker would you like to search?",
-            required = True,
-            option_type = 3
-        ),
-        create_option(
-            name = "ticker2",
-            description = "What Ticker would you like to search?",
-            required=True,
-            option_type = 3
-        )
-    ]
-)
-async def _correlation(ctx:SlashContext, ticker1: str, ticker2: str):
-    ticker1 = ticker1.upper()
-    ticker2 = ticker2.upper()
-    response = discord.Embed(
-        title = f"{ticker1} and {ticker2} Info",
-        description = ""
-    )
+#@slash.slash(
+#    name = "correlation",
+#    description = "Command that returns the correlation of two stocks",
+#    guild_ids = guilds,
+#    options = [
+#        create_option(
+#            name = "ticker1",
+ #           description = "What Ticker would you like to search?",
+  #          required = True,
+   #         option_type = 3
+    #    ),
+     #   create_option(
+      #      name = "ticker2",
+      #      description = "What Ticker would you like to search?",
+       #     required=True,
+        #    option_type = 3
+        #)
+    #]
+#)
+#async def _Correlation(ctx:SlashContext, ticker1: str, ticker2: str):
+#    ticker1 = ticker1.upper()
+#    ticker2 = ticker2.upper()
+#    response = discord.Embed(
+#        title = f"{ticker1} and {ticker2} Info",
+#        description = ""
+#    )
 
 
-       # description = "Description",
-        #colour = discord.Color.from_rgb(235, 121, 96)    
-    #)
-    
-    #data = stock_info(ticker)
-    #response.set_author(name="Finn Bot")
-    #response.add_field(name='Beta', value=data['Beta'], inline=True)
-    #response.add_field(name='STD', value=data['STD'], inline=True)
-    #response.add_field(name='52Wk High', value=data['52Wk High'], inline=True)
-    #response.add_field(name='52Wk Low', value=data['52Wk Low'], inline=True)
-    #response.add_field(name='Last Trading Day Open', value=data['Last Trading Day Open'], inline=True)
-    #response.add_field(name='Last Trading Day Close', value=data['Last Trading Day Close'], inline=True)
-    #await ctx.send(embed=response)
+ 
 
 
 

@@ -63,13 +63,28 @@ def valid_ticker_list(ticker_list):
     ticker_hist = yf.download(
                     tickers = " ".join(ticker_list),
                     # Download Data From the past 6 months
-                    period = "6mo",
+                    period = "5d",
                     interval = "1d",
                     group_by = 'tickers',
                     threads = True
                 )
     return list(dict.fromkeys([t[0] for t in ticker_hist.dropna(axis=1, how='all').columns]))
 
+def create_price_list(ticker_list):
+    new_ticker_list = sorted(ticker_list)
+    price_list = []
+    ticker_hist = yf.download(
+                    tickers = " ".join(ticker_list),
+                    # Download Data From the past 6 months
+                    period = "5d",
+                    interval = "1d",
+                    threads = True
+                )
+    last_row = ticker_hist['Close'].iloc[-1]
+    last_date = (ticker_hist.iloc[-1].name).strftime("%Y-%m-%d")
+    for x in new_ticker_list:
+        price_list.append(last_row[x])
+    return (price_list, last_date)
 
 class Portfolio:
     
@@ -116,77 +131,51 @@ def stock_history(ticker, start_date, end_date):
     return stock_history
 
 
-def price_weighted(ticker_list, start_date, end_date):
+def price_weighted(ticker_list, starting_balance, price_list):
 
     # Create DataFrame
-    pw_portfolio = pd.DataFrame()
+    pw_portfolio = pd.DataFrame(index = ticker_list)
+    pw_portfolio["Shares"] = 0
     num_tickers = len(ticker_list)
-
-    # Add Close price columns for each stock
-    for i in range(len(ticker_list)):
-        ticker_hist = ticker_list[i].history(start = start_date, end = end_date)
-        pw_portfolio[f'{ticker_list[i]} Close'] = ticker_hist.Close
+    value_per_share = starting_balance/num_tickers
     
-    # Get Price Weighted Index
-    pw_portfolio['Price Weighted Index'] = (pw_portfolio.sum(axis=1))/num_tickers
+    # Add Close price columns for each stock
+    
+    for i in range(len(ticker_list)):
+        
+        pw_portfolio['Shares'].loc[ticker_list[i]] = value_per_share/price_list[i]
+    
 
     return pw_portfolio
 
-def equally_weighted_portfolio(investment, ticker_list, start_date, end_date):
-    
-    today = date.today()
-    tmr = today + datetime.timedelta(days = 1)
 
-    # Create DataFrame
-    
-    ew_portfolio = pd.DataFrame()
-    ew_portfolio['Tickers'] = ticker_list
-    num_tickers = len(ticker_list)
-    close = []
-    value_per_stock = investment/num_tickers
-    shares = []
-    
-    for i in range (len(ticker_list)):
-        yf_ticker = yf.Ticker(ticker_list[i])
-        ticker_hist = yf_ticker.history(start=today, end=tmr)
-        shares.append(value_per_stock/ticker_hist.Close[0])
-        
-        
-    ew_portfolio['Shares'] = shares
-    ew_portfolio.set_index('Tickers', inplace=True)
-    
-    return ew_portfolio
-
-
-def market_weighted(ticker_list, start_date, end_date, starting_balance):
+def market_weighted(ticker_list, starting_balance, price_list):
     
     stock_dict = {}
     totalMarketCap = 0
-    for ticker in ticker_list:
-        stock_dict[ticker] = yf.Ticker(ticker)
-        stock_dict[f"{ticker} Shares Outstanding"] = stock_dict[ticker].info["sharesOutstanding"]
-        stock_dict[f"{ticker} History"] = stock_dict[ticker].history(start = start_date, end = end_date).Close
-        stock_dict[f"{ticker} Market Capitalization"] = stock_dict[f"{ticker} Shares Outstanding"] * stock_dict[f"{ticker} History"].iloc[0]
-        totalMarketCap += stock_dict[f"{ticker} Market Capitalization"]
+    for i in range(len(ticker_list)):
+        stock_dict[f"{ticker_list[i]} Shares Outstanding"] = yf.Ticker(ticker_list[i]).info["sharesOutstanding"]
+        stock_dict[f"{ticker_list[i]} Market Capitalization"] = stock_dict[f"{ticker_list[i]} Shares Outstanding"] * price_list[i]
+        totalMarketCap += stock_dict[f"{ticker_list[i]} Market Capitalization"]
     
-    ticker_list = ["AAPL", "GOOG", "TSLA"]
     market_weighted_df = pd.DataFrame(index = ticker_list)
     market_weighted_df.index.rename("Ticker", inplace = True)
     market_weighted_df["Shares"] = 0
     
-    for ticker in ticker_list:
-        stock_dict[f"{ticker} Market Capitalization Percent"] = stock_dict[f"{ticker} Market Capitalization"] / totalMarketCap
-        #print(stock_dict[f"{ticker} Market Capitalization Percent"])
-        #print(stock_dict[f"{ticker} Market Capitalization Percent"] * starting_balance)
-        market_weighted_df.loc[ticker,"Shares"] = (stock_dict[f"{ticker} Market Capitalization Percent"] * starting_balance) / stock_dict[f"{ticker} History"].iloc[0]
+    for i in range(len(ticker_list)):
+        stock_dict[f"{ticker_list[i]} Market Capitalization Percent"] = stock_dict[f"{ticker_list[i]} Market Capitalization"] / totalMarketCap
+        market_weighted_df.loc[ticker_list[i],"Shares"] = (stock_dict[f"{ticker_list[i]} Market Capitalization Percent"] * starting_balance) / price_list[i]
    
     return market_weighted_df
+
     
-def portfolio_maker(ticker_list, start_date, end_date, weight_option, money):
+def portfolio_maker(ticker_list, weight_option, starting_balance):
     
     # Get valid ticker list
     valid_tickers = valid_ticker_list(ticker_list)
-
+    tot_data = create_price_list(valid_tickers)
+    prices_list = tot_data[0]
+    last_day = tot_data[1]
     if not valid_tickers:
         print('No valid tickers were inputted!')
         return None
@@ -194,24 +183,22 @@ def portfolio_maker(ticker_list, start_date, end_date, weight_option, money):
         print('Exceeded Maximum Number of Tickers!')
         return None
     else:
-        # save weight option
-        option = weight_option.upper()
-
         # check weight option
-        if option == 'PRICE WEIGHTED':
-            portfolio = equally_weighted_portfolio(money, ticker_list, start_date, end_date)
+        if weight_option == 'PRICE WEIGHTED':
+            portfolio = price_weighted(ticker_list,starting_balance,prices_list)
 
-        elif option == 'MARKET WEIGHTED':
-            portfolio = market_weighted(ticker_list, start_date, end_date, money)
+        elif weight_option == 'MARKET WEIGHTED':
+            portfolio = market_weighted(ticker_list,starting_balance,prices_list)
 
         else:
-            portfolio = smart_weighted(ticker_list, start_date, end_date, option, money)
+            portfolio = smart_weighted(ticker_list, weight_option)
         
         if not portfolio:
             return None
         else:
-            # portfolio should be a tuple with (actualportfolio, date)
-            return portfolio
+            pass
+        return (portfolio,last_day)
+
 
 
 # Earnings per Share/ Return on equity?
@@ -219,10 +206,14 @@ def portfolio_maker(ticker_list, start_date, end_date, weight_option, money):
 
 # Company info (location, industry, market capitalization)
 def company_info(ticker):
-    location = ticker.info['city'] + ", " + ticker.info['country']
-    industry = ticker.info['industry']
-    market_cap = ticker.info['marketCap']
-    return [location, industry, market_cap]
+    try:
+        location = ticker.info['city'] + ", " + ticker.info['country']
+        industry = ticker.info['industry']
+        market_cap = ticker.info['marketCap']
+        return [location, industry, market_cap]
+    except: 
+        print("Oops! There's no information available!")
+    
 
 def regenerate_portfolio(portfolio: dict):
     last_tday = last_trading_day()
