@@ -1,12 +1,13 @@
 import yfinance as yf
 import matplotlib.pyplot as plt
-import numpy as npf
+import numpy as np
 import pandas as pd
 import datetime 
 from datetime import date
 import random
 
 from finance_functions import *
+# from risky_smart_weights import *
 
 def smart_weighted(ticker_list, start_date, end_date, option, initial_capital):
     if option not in ('RISKY', 'SAFE'):
@@ -23,7 +24,7 @@ def safe_method(ticker_list, start_date, end_date):
     data = data['Adj Close']
     
     #Calculate percent change
-    percent_change = data.pct_change().apply(lambda x: npf.log(1 + x))
+    percent_change = data.pct_change().apply(lambda x: np.log(1 + x))
 
     #Caluclate covariance
     cov_matrix = percent_change.cov()
@@ -42,7 +43,7 @@ def safe_method(ticker_list, start_date, end_date):
 
     #Calculate annual std
     annual_std = percent_change.std().apply(
-        lambda x: x * npf.sqrt(trading_days)
+        lambda x: x * np.sqrt(trading_days)
     )
 
     yearly_stats['Volatility'] = annual_std
@@ -52,11 +53,11 @@ def safe_method(ticker_list, start_date, end_date):
     volatility = []
 
     for i in range (1000):
-        individual_weights = npf.random.random(len(ticker_list))
-        individual_weights = individual_weights/npf.sum(individual_weights)
+        individual_weights = np.random.random(len(ticker_list))
+        individual_weights = individual_weights/np.sum(individual_weights)
         weights.append(individual_weights)
 
-        individual_returns = npf.dot(individual_weights, yearly_stats.Returns)
+        individual_returns = np.dot(individual_weights, yearly_stats.Returns)
         returns.append(individual_returns)
 
         portfolio_variance = (
@@ -66,8 +67,8 @@ def safe_method(ticker_list, start_date, end_date):
             .sum()
         )
 
-        standard_deviation = npf.sqrt(portfolio_variance)
-        individual_volatility = standard_deviation * npf.sqrt(trading_days)
+        standard_deviation = np.sqrt(portfolio_variance)
+        individual_volatility = standard_deviation * np.sqrt(trading_days)
         volatility.append(individual_volatility)
     
     portfolios = pd.DataFrame(index=range(1000))
