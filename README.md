@@ -212,6 +212,8 @@ Karen Huang - [Linkedin](https://www.linkedin.com/in/karenklhuang/) - karen.kl.h
 
 Daniel Jiang - [Linkedin](https://www.linkedin.com/in/danieljiang378/) - danieljiang378@gmail.com
 
+Vanessa Liu - [Linkedin](https://www.linkedin.com/in/vanessa-liu014/) - vanessaliu014@gmail.com
+
 Daniel Kim - [Linkedin](https://www.linkedin.com/in/daniel-kim-82295120b/) - danielkim1345@gmail.com
 
 Yuqian Lin - [Linkedin](https://www.linkedin.com/in/yuqian-lin-7529451b5/) - yuqianlintsks502@gmail.com
