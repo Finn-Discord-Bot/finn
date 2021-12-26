@@ -1,59 +1,31 @@
-<div id="top"></div>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
-
-
-
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
-
-
 <!-- PROJECT LOGO -->
 <br />
-<div align="center">
-  <a href="https://github.com/github_username/repo_name">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+<p align="center">
+  <a href="https://github.com/Finn-Discord-Bot/finn">
+    <img src="images/finn.png" alt="Logo" width="320" height="320">
   </a>
 
-<h3 align="center">project_title</h3>
-
+  <h3 align="center">Finn</h3>
+  <h4 align="center"><a href="https://devpost.com/software/finn-u7hden" target="_blank">Devpost Link</a></h4>
+  <h4 align="center"><a href="https://invitefinn.tech" target="_blank">» Invite Finn to your Discord server!</a></h4>
+  
   <p align="center">
-    project_description
+    An all-in-one financial analytics bot to help you gain quantitative financial insights. Finn is a Discord Bot that lets you explore the stock market like you've never before!
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/Finn-Discord-Bot/finn#table-of-contents"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
+    <a href="" target="_blank">View Demo</a>
     ·
-    <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
+    <a href="https://github.com/Finn-Discord-Bot/finn/issues">Report Bug</a>
     ·
-    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
+    <a href="https://github.com/Finn-Discord-Bot/finn/issues">Request Feature</a>
   </p>
-</div>
-
-
+</p>
 
 <!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
+<details open="open">
+  <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
@@ -73,104 +45,121 @@
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#acknowledgements">Acknowledgements</a></li>
   </ol>
 </details>
-
 
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Banner](img/F_I_N_N_1.png)](https://invitefinn.tech/)
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email`, `email_client`, `project_title`, `project_description`
+A one-of-a-kind FINNancial analytics Discord bot!
 
-<p align="right">(<a href="#top">back to top</a>)</p>
-
+Finn is a bot that seeks to provide a multitude of features to improve financial literacy and smoothen the learning curve that beginners may face coming into finance. By accessing Yahoo Finance’s python library, Finn can provide a wide range of key statistics that new or experienced investors may need when assessing whether to invest in a company. Finn can also help you plan and build a portfolio based on what you need! If you input a list of stock tickers, Finn will algorithmically produce a weighted portfolio of a specified type for your use. 
 
 
 ### Built With
 
-* [Next.js](https://nextjs.org/)
-* [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
+* [discord.py](https://discordpy.readthedocs.io/en/stable/)
+* [discord.py-slash-commands](https://discord-py-slash-command.readthedocs.io/en/latest/)
+* [DataStax Astra's Apache Cassandra Databases](https://www.datastax.com/products/datastax-astra)
+* [Domain.com](https://www.domain.com/)
+* [Linode Cloud](https://www.linode.com/)
+* [yFinance](https://github.com/ranaroussi/yfinance)
 
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
 This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+### Prerequisites
+
+* Python `3.8.x`, `pip3`
+
+1. Update before installing new packages
+
+   ```sh
+   sudo apt-get update
+   ```
+2. Check Python version
+
+   ```sh
+   python3 --version
+   ```
+3. If Python version < `3.8`
+
+   ```sh
+   sudo apt install python3.8
+   ```
+4. Validate
+
+   ```sh
+   python3.8 --version
+   ```
+5. Install `pip3`
+
+   ```sh
+   sudo apt-get -y install python3-pip
+   ```
+6. Validate
+
+   ```sh
+   pip3 --version
+   ```
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone https://github.com/Finn-Discord-Bot/finn.git
    ```
-3. Install NPM packages
+2. `cd` into repo directory
    ```sh
-   npm install
+   cd finn
    ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
+3. Install Prerequisite Libraries
+   ```sh
+   pip3 install -r requirements.txt
    ```
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
+4. Create a Discord Bot on the [Discord Developer Portal](https://discord.com/developers/applications)
+5. Configure [DataStaxAstra Cassandra Database](https://astra.datastax.com/)
+    * Initialize CQL Database with keyspace `portfolios`
+    * Click on **Connect** in the initialized database. Download and add `secure-connect-database-name.zip` to main directory.
+6. Add tokens to `config.json`
+  * Copy [tokens](https://astra.datastax.com/settings/tokens) from DataStax Astra Database into `config.json`
+  * Bot tokens for Discord can be found in the [Discord Developer Portal](https://discord.com/developers/docs/intro). 
+7. Start bot
+  ```sh
+  python3 main.py
+  ```
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+_For more examples, please refer to the [Demo]()_
 
 
 
 <!-- ROADMAP -->
 ## Roadmap
 
-- [] Feature 1
-- [] Feature 2
-- [] Feature 3
-    - [] Nested Feature
-
-See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+* Web interface to access your portfolio and other features.
+* Allow multiple portfolios.
+* Enable the ability to purchase the same stock twice in a portfolio.
 
 
 
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -178,53 +167,19 @@ Don't forget to give the project a star! Thanks again!
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 
 
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+Distributed under the MIT License. See `LICENSE` for more information.
 
 
 
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
-
-Project Link: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+Timothy Zheng - [Linkedin](https://www.linkedin.com/in/timothy-zheng21/) - timothyzheng123@gmail.com
 
 
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-* []()
-* []()
-* []()
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
-[contributors-url]: https://github.com/github_username/repo_name/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
-[forks-url]: https://github.com/github_username/repo_name/network/members
-[stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
-[stars-url]: https://github.com/github_username/repo_name/stargazers
-[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
-[issues-url]: https://github.com/github_username/repo_name/issues
-[license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/github_username/repo_name/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/linkedin_username
-[product-screenshot]: images/screenshot.png
+Devpost Link: [https://devpost.com/software/finn-u7hden](https://devpost.com/software/finn-u7hden)
