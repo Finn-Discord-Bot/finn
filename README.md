@@ -2,7 +2,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/Finn-Discord-Bot/finn">
-    <img src="images/finn.png" alt="Logo" width="320" height="320">
+    <img src="images/finn.png" alt="Logo" width="225" height="225">
   </a>
 
   <h3 align="center">Finn</h3>
