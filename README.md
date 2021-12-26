@@ -49,6 +49,9 @@
   </ol>
 </details>
 
+<!-- DISCLAIMER -->
+## Disclaimer
+FINN IS A PROJECT DESIGNED TO HELP USERS EXPLORE THE WORLD OF COMPUTATIONAL FINANCE. IN NO WAY ARE THE RESULTS PRODUCED BY FINN DESIGNED TO BE INTERPRETED AND/OR USED AS FINANCIAL ADVICE. THERE ARE RISKS ASSOCIATED WITH INVESTING IN SECURITIES AND INVOLVE THE RISK OF FINANCIAL LOSS. A SECURITY'S PAST PERFORMANCE IS NOT A GUARANTEE OR PREDICTOR OF FUTURE INVESTMENT PERFORMANCE. USE OF THE CODE IN THIS ASSIGNMENT IS LICENSED BY THE MIT LICENSE. SEE LICENSE FOR MORE.
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -132,16 +135,29 @@ This is an example of how to list things you need to use the software and how to
     * Initialize CQL Database with keyspace `portfolios`
     * Click on **Connect** in the initialized database. Download and add `secure-connect-database-name.zip` to main directory.
 6. Add tokens to `config.json`
-  * Copy [tokens](https://astra.datastax.com/settings/tokens) from DataStax Astra Database into `config.json`
-  * Bot tokens for Discord can be found in the [Discord Developer Portal](https://discord.com/developers/docs/intro). 
+    * Copy [tokens](https://astra.datastax.com/settings/tokens) from DataStax Astra Database into `config.json`
+    * Bot tokens for Discord can be found in the [Discord Developer Portal](https://discord.com/developers/docs/intro). 
 7. Start bot
-  ```sh
-  python3 main.py
-  ```
+    ```sh
+    python3 main.py
+    ```
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
+`/help` Provides a list of all possible commands
+
+#####There are three groups of commands
+
+***Stock Commands***
+* `/companyinfo` takes in a single ticker and displays the _Company Location, Company Industry, and Market Capitalization_ of the specified ticker.
+* `/stockinfo` takes in a single ticker and displays various financial statistics about the specified ticker
+* `/stockhistory` takes in a single ticker, a start date, and an end date. It displays the tickers historical values over the specified date range.
+***Finance Commands***
+* `/lasttradingday` displays the last date where trading has occured.
+* `/options` takes in a single ticker, a range, and the option type (call or put). The range indicates how close the user will like the options to be to the current stock price. The option type indicates if the user wants to see _calls_ or _puts_.
+***Portfolio Commands***
+* `/createportfolio` takes in a portfolio type, a list of tickers, and the starting capital.
 
 _For more examples, please refer to the [Demo]()_
 
@@ -153,7 +169,6 @@ _For more examples, please refer to the [Demo]()_
 * Web interface to access your portfolio and other features.
 * Allow multiple portfolios.
 * Enable the ability to purchase the same stock twice in a portfolio.
-
 
 
 <!-- CONTRIBUTING -->
