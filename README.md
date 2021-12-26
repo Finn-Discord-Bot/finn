@@ -169,7 +169,7 @@ This is an example of how to list things you need to use the software and how to
 * `/removestock` takes in a ticker and removes it from the users portfolio.
 * `/cleartable` clears the users current portfolio. 
 
-_For more examples, please refer to the [Demo]()_
+_For more examples, please refer to the [Demo](https://youtu.be/gziw6_XJn18)_
 
 
 
