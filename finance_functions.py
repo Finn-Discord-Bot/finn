@@ -407,20 +407,23 @@ def pe_ratio(ticker_list):
 #Requires the user to input a price range and put/call 
 def options(ticker, range_length, put_call):
     stock = yf.Ticker(ticker)
-    opt = stock.option_chain(stock.options[1])
-    
-    #If user wants put option or call option
-    if put_call == "put":
-        opt = pd.DataFrame().append(opt.puts)
-    elif put_call == "call":
-        opt = pd.DataFrame().append(opt.calls)
+    try:
+        opt = stock.option_chain(stock.options[1])
+        
+        #If user wants put option or call option
+        if put_call == "put":
+            opt = pd.DataFrame().append(opt.puts)
+        elif put_call == "call":
+            opt = pd.DataFrame().append(opt.calls)
 
-    stockSP = stock.info['currentPrice']
+        stockSP = stock.info['currentPrice']
 
-    #Determine and display the calls that meet the criteria that is $5 within the current price
-    calls = opt.loc[((stockSP-range_length)<=opt['strike'])&((stockSP+range_length) >= opt['strike'])]
+        #Determine and display the calls that meet the criteria that is $5 within the current price
+        calls = opt.loc[((stockSP-range_length)<=opt['strike'])&((stockSP+range_length) >= opt['strike'])]
 
-    return calls
+        return calls
+    except:
+        return "Option data not found. Please try another ticker."
 
 
 #Volatility (standard deviation)
@@ -431,36 +434,37 @@ def std(portfolio):
     return monthly_returns.std() 
 
 
-#Correlation with other stocks (need 2 tickers to be inputed)
-def correlation(ticker1, ticker2):
-    # get ticker info
-    ticker1 = yf.Ticker(ticker1)
-    ticker1_info = ticker1.info
+# #Correlation with other stocks (need 2 tickers to be inputed)
+# def correlation(ticker1, ticker2):
+#     # get ticker info
+#     ticker1 = yf.Ticker(ticker1)
+#     ticker1_info = ticker1.info
     
-    ticker2 = yf.Ticker(ticker2)
-    ticker2_info = ticker2.info
+#     ticker2 = yf.Ticker(ticker2)
+#     ticker2_info = ticker2.info
     
-    # check ticker validity, and proceeding  
-    if ticker1_info['regularMarketPrice'] != None or ticker2_info['regularMarketPrice'] != None:
-        start_date = '1900-01-01'
-        rightnow = datetime.datetime.now()
-        end_date = rightnow.strftime("%Y-%m-%d")
-        un_ticker1_hist = ticker1.history(start = start_date, close = end_date)
-        un_ticker2_hist = ticker2.history(start = start_date, close = end_date)
-        if un_ticker1_hist.index[0].strftime("%Y-%m-%d") > un_ticker2_hist.index[0].strftime("%Y-%m-%d"):
-            real_start_date = un_ticker2_hist.index[0].strftime("%Y-%m-%d")
-        else:
-            real_start_date = un_ticker1_hist.index[0].strftime("%Y-%m-%d")
-        ticker1_hist = ticker1.history(start = real_start_date, close = end_date ,interval="1mo").dropna()
-        ticker2_hist = ticker2.history(start = real_start_date, close = end_date, interval = "1mo").dropna()
-        prices = pd.DataFrame(ticker1_hist['Close'])
-        prices.columns = [ticker1]
-        prices[ticker2] = ticker2_hist['Close']
-        monthly_returns = 100 * prices.pct_change()[1:]
-        print("Correlation:")
-        print(100 * monthly_returns.corr().iat[0,1])
+#     # check ticker validity, and proceeding  
+#     if ticker1_info['regularMarketPrice'] != None or ticker2_info['regularMarketPrice'] != None:
+#         start_date = '1900-01-01'
+#         rightnow = datetime.datetime.now()
+#         end_date = rightnow.strftime("%Y-%m-%d")
+#         un_ticker1_hist = ticker1.history(start = start_date, close = end_date)
+#         un_ticker2_hist = ticker2.history(start = start_date, close = end_date)
+#         if un_ticker1_hist.index[0].strftime("%Y-%m-%d") > un_ticker2_hist.index[0].strftime("%Y-%m-%d"):
+#             real_start_date = un_ticker2_hist.index[0].strftime("%Y-%m-%d")
+#         else:
+#             real_start_date = un_ticker1_hist.index[0].strftime("%Y-%m-%d")
+#         ticker1_hist = ticker1.history(start = real_start_date, close = end_date ,interval="1mo").dropna()
+#         ticker2_hist = ticker2.history(start = real_start_date, close = end_date, interval = "1mo").dropna()
+#         prices = pd.DataFrame(ticker1_hist['Close'])
+#         prices.columns = [ticker1]
+#         prices[ticker2] = ticker2_hist['Close']
+#         monthly_returns = 100 * prices.pct_change()[1:]
+#         print("Correlation:")
+#         print(100 * monthly_returns.corr().iat[0,1])
 
-    else:
-        print("Invalid Ticker(s). Please try again.")
+#     else:
+#         return "error"
+#         print("Invalid Ticker(s). Please try again.")
 
 # Different companies and fees
