@@ -214,6 +214,6 @@ Daniel Jiang - [Linkedin](https://www.linkedin.com/in/danieljiang378/) - danielj
 
 Daniel Kim - [Linkedin](https://www.linkedin.com/in/daniel-kim-82295120b/) - danielkim1345@gmail.com
 
-Yuqian Lin - [Linkedin] (https://www.linkedin.com/in/yuqian-lin-7529451b5/) - yuqianlintsks502@gmail.com
+Yuqian Lin - [Linkedin](https://www.linkedin.com/in/yuqian-lin-7529451b5/) - yuqianlintsks502@gmail.com
 
 Devpost Link: [https://devpost.com/software/finn-u7hden](https://devpost.com/software/finn-u7hden)
