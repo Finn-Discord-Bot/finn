@@ -15,7 +15,7 @@
     <a href="https://github.com/Finn-Discord-Bot/finn#table-of-contents"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="" target="_blank">View Demo</a>
+    <a href="https://youtu.be/gziw6_XJn18" target="_blank">View Demo</a>
     ·
     <a href="https://github.com/Finn-Discord-Bot/finn/issues">Report Bug</a>
     ·
