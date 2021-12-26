@@ -212,4 +212,6 @@ Karen Huang - [Linkedin](https://www.linkedin.com/in/karenklhuang/) - karen.kl.h
 
 Daniel Jiang - [Linkedin](https://www.linkedin.com/in/danieljiang378/) - danieljiang378@gmail.com
 
+Daniel Kim - [Linkedin](https://www.linkedin.com/in/daniel-kim-82295120b/) - danielkim1345@gmail.com
+
 Devpost Link: [https://devpost.com/software/finn-u7hden](https://devpost.com/software/finn-u7hden)
