@@ -218,4 +218,8 @@ Daniel Kim - [Linkedin](https://www.linkedin.com/in/daniel-kim-82295120b/) - dan
 
 Yuqian Lin - [Linkedin](https://www.linkedin.com/in/yuqian-lin-7529451b5/) - yuqianlintsks502@gmail.com
 
+Victoria Zhao - [Linkedin](https://www.linkedin.com/in/victoria-zhao-58b808229/) - victoria17zhao@gmail.com
+
+Jacky Xu - [Linkedin](https://www.linkedin.com/in/jacky-xu-b38987170/) - jacky.x0423@gmail.com
+
 Devpost Link: [https://devpost.com/software/finn-u7hden](https://devpost.com/software/finn-u7hden)
