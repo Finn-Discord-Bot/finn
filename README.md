@@ -53,7 +53,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Banner](img/F_I_N_N_1.png)](https://invitefinn.tech/)
+[![Banner](images/F_I_N_N_1.png)](https://invitefinn.tech/)
 
 A one-of-a-kind FINNancial analytics Discord bot!
 
