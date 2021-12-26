@@ -52,7 +52,7 @@
 <!-- DISCLAIMER -->
 ## Disclaimer
 <table border=1 cellpadding=10><tr><td>
-FINN IS A PROJECT DESIGNED TO HELP USERS EXPLORE THE WORLD OF COMPUTATIONAL FINANCE. IN NO WAY ARE THE RESULTS PRODUCED BY FINN DESIGNED TO BE INTERPRETED AND/OR USED AS FINANCIAL ADVICE. THERE ARE RISKS ASSOCIATED WITH INVESTING IN SECURITIES AND INVOLVE THE RISK OF FINANCIAL LOSS. A SECURITY'S PAST PERFORMANCE IS NOT A GUARANTEE OR PREDICTOR OF FUTURE INVESTMENT PERFORMANCE. USE OF THE CODE IN THIS ASSIGNMENT IS LICENSED BY THE MIT LICENSE. SEE LICENSE FOR MORE.
+FINN IS A PROJECT DESIGNED TO HELP USERS EXPLORE THE WORLD OF COMPUTATIONAL FINANCE. IN NO WAY ARE THE RESULTS PRODUCED BY FINN DESIGNED TO BE INTERPRETED AND/OR USED AS FINANCIAL ADVICE. THERE ARE RISKS ASSOCIATED WITH INVESTING IN SECURITIES AND INVOLVE THE RISK OF FINANCIAL LOSS. A SECURITY'S PAST PERFORMANCE IS NOT A GUARANTEE OR PREDICTOR OF FUTURE INVESTMENT PERFORMANCE. USE OF THE CODE IN THIS ASSIGNMENT IS LICENSED BY THE MIT LICENSE. SEE [LICENSE](https://github.com/Finn-Discord-Bot/finn/blob/main/LICENSE) FOR MORE.
 </td></tr></table>
 
 <!-- ABOUT THE PROJECT -->
@@ -149,17 +149,25 @@ This is an example of how to list things you need to use the software and how to
 
 `/help` Provides a list of all possible commands
 
-#####There are three groups of commands
+##### There are three groups of commands
 
 ***Stock Commands***
 * `/companyinfo` takes in a single ticker and displays the _Company Location, Company Industry, and Market Capitalization_ of the specified ticker.
 * `/stockinfo` takes in a single ticker and displays various financial statistics about the specified ticker
 * `/stockhistory` takes in a single ticker, a start date, and an end date. It displays the tickers historical values over the specified date range.
+
+
 ***Finance Commands***
 * `/lasttradingday` displays the last date where trading has occured.
 * `/options` takes in a single ticker, a range, and the option type (call or put). The range indicates how close the user will like the options to be to the current stock price. The option type indicates if the user wants to see _calls_ or _puts_.
+
+
 ***Portfolio Commands***
-* `/createportfolio` takes in a portfolio type, a list of tickers, and the starting capital. There are various types of portfolios. _Equally Weighted_ produces a portfolio of equal weight amongst the tickers. _Price Weighted_ weighs the tickers by the share price. _Market-Capitalization Weighted_ weighs the tickers based off of the market capitalization of each ticker. _Risky Smart Weighted_ weighs the tickers by considering the underlying risk of the ticker, compared to the greatest possible return. This portfolio is expected
+* `/createportfolio` takes in a portfolio type, a list of tickers, and the starting capital. There are various types of portfolios. _Equally Weighted_ produces a portfolio of equal weight amongst the tickers. _Price Weighted_ weighs the tickers by the share price. _Market-Capitalization Weighted_ weighs the tickers based off of the market capitalization of each ticker. _Risky Smart Weighted_ weighs the tickers by considering the underlying risk of the ticker, compared to the greatest possible return. This portfolio is expected to have the greatest value movements, which may be in either direction. _Safe Smart Weighted_ weighs the tickers by considering the overall risk of each ticker. It gives precedence to the tickers whos risk is lowest. This portfoli is expected to have the least value movements. The starting capital is the amount of cash the user wants to create the portfolio with. ***Every user can create their own portfolio, and will be stored seperately***
+* `/displayportfolio` displays the current users portfolio.
+* `/addstock` takes in a ticker and the quantity of shares. It adds the specified shares to the users portfolio.
+* `/removestock` takes in a ticker and removes it from the users portfolio.
+* `/cleartable` clears the users current portfolio. 
 
 _For more examples, please refer to the [Demo]()_
 
