@@ -271,7 +271,9 @@ def regenerate_portfolio(portfolio: dict):
     # Find the smallest date (earliest)
     earliest_date = sorted(incep_dates)[0]
     latest_date = sorted(incep_dates)[-1]
-    if latest_date == last_tday:
+    latest_date = datetime.datetime.strptime(latest_date, "%Y-%m-%d")
+    last_tday = datetime.datetime.strptime(last_tday, "%Y-%m-%d")
+    if abs((latest_date - last_tday).days) < 3:
         return None
     
     # Download Stock Data

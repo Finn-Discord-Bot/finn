@@ -78,7 +78,7 @@ def safe_method(ticker_list, start_date, end_date):
     returns = []
     volatility = []
 
-    for i in range(10):
+    for i in range(1000):
         individual_weights = np.random.random(len(ticker_list))
         individual_weights = individual_weights/np.sum(individual_weights)
         weights.append(individual_weights)
@@ -149,4 +149,4 @@ def generate_safe_portfolio(ticker_list, start_date, end_date, initial_capital):
     
     FinalPortfolio.set_index('Ticker', inplace=True)
             
-    return (FinalPortfolio, current_day)
+    return (FinalPortfolio, current_day.strftime("%Y-%m-%d"))

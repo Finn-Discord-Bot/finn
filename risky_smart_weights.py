@@ -1,8 +1,6 @@
 import pandas as pd
-import numpy as np
 import yfinance as yf
 from datetime import datetime, timedelta, timezone
-from threading import Thread
 import random
 
 
@@ -166,7 +164,7 @@ def generate_risky_portfolio(tickerlist: list, totalspend: int):
         print('Error - Insufficient options data for inputted tickers, skipping options analysis...')
     
     # Monte Carlo Analysis
-    trials = 10
+    trials = 250
     
     # We will collect the risk coefficients of all portfolios in this dictionary
     # Ultimately, we are comparing the best stocks obtained by the beta and options method,

@@ -32,6 +32,7 @@ def add_stock(uuid: int, ticker: str, qnty: float, settledate: str):
                     )
                     """)
     session.execute(f"INSERT INTO user{uuid} (ticker, qnty, settledate) VALUES ('{ticker}', {qnty}, '{settledate}')")
+    return ticker
 
 
 # Remove a stock from a user's portfolio
