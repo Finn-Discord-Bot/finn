@@ -214,8 +214,7 @@ def market_weighted(ticker_list, starting_balance, price_list):
 def portfolio_maker(ticker_list, weight_option, starting_balance, userid):
     
     # Get valid ticker list
-    valid_tickers = valid_ticker_list(ticker_list)
-    tot_data = create_price_list(valid_tickers)
+    tot_data = create_price_list(ticker_list)
     prices_list = tot_data[0]
     last_day = tot_data[1]
     if not valid_tickers:
@@ -307,22 +306,6 @@ def regenerate_portfolio(portfolio: dict):
     portfolio_df = portfolio_df[['TOTAL_VALUE']].loc[(portfolio_df[['TOTAL_VALUE']]!=0).any(axis=1)]
     portfolio_df['RETURNS'] = portfolio_df['TOTAL_VALUE'].pct_change() * 100
     return (portfolio_df[['TOTAL_VALUE', 'RETURNS']], investment)
-
-    
-    
-    
-        
-        
-
-
-# {'HOOD': [Decimal('1.12345'), '2021-21-24'],
-# ,
-# ,
-# ,
-# ,
-# ,
-# }
-# print(get_portfolio(00000))
 
 def portfolio_graphs(portfolio: dict, userid: int):
     # Create desired portfolio with ticker list
