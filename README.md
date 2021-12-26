@@ -51,7 +51,9 @@
 
 <!-- DISCLAIMER -->
 ## Disclaimer
+<table border=1 cellpadding=10><tr><td>
 FINN IS A PROJECT DESIGNED TO HELP USERS EXPLORE THE WORLD OF COMPUTATIONAL FINANCE. IN NO WAY ARE THE RESULTS PRODUCED BY FINN DESIGNED TO BE INTERPRETED AND/OR USED AS FINANCIAL ADVICE. THERE ARE RISKS ASSOCIATED WITH INVESTING IN SECURITIES AND INVOLVE THE RISK OF FINANCIAL LOSS. A SECURITY'S PAST PERFORMANCE IS NOT A GUARANTEE OR PREDICTOR OF FUTURE INVESTMENT PERFORMANCE. USE OF THE CODE IN THIS ASSIGNMENT IS LICENSED BY THE MIT LICENSE. SEE LICENSE FOR MORE.
+</td></tr></table>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -157,7 +159,7 @@ This is an example of how to list things you need to use the software and how to
 * `/lasttradingday` displays the last date where trading has occured.
 * `/options` takes in a single ticker, a range, and the option type (call or put). The range indicates how close the user will like the options to be to the current stock price. The option type indicates if the user wants to see _calls_ or _puts_.
 ***Portfolio Commands***
-* `/createportfolio` takes in a portfolio type, a list of tickers, and the starting capital.
+* `/createportfolio` takes in a portfolio type, a list of tickers, and the starting capital. There are various types of portfolios. _Equally Weighted_ produces a portfolio of equal weight amongst the tickers. _Price Weighted_ weighs the tickers by the share price. _Market-Capitalization Weighted_ weighs the tickers based off of the market capitalization of each ticker. _Risky Smart Weighted_ weighs the tickers by considering the underlying risk of the ticker, compared to the greatest possible return. This portfolio is expected
 
 _For more examples, please refer to the [Demo]()_
 
