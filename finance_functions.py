@@ -4,7 +4,7 @@ import numpy as npf
 import pandas as pd
 import datetime
 from smart_weights import * 
-
+from connect_database import add_portfolio
 # Variables
 # Will have to globalize the yfinance data too cause having to constantly do api calls is going to make our code really slow
 global stock 
@@ -42,22 +42,27 @@ def last_trading_day():
 
 
 # Stock Info (Open, High, Low, Close, Volume, Dividends, Stock Splits)  
-def stock_info(ticker):    
-    stock_infopkg = {}
-    beta_std = betastd(ticker)
-    stock_infopkg['Beta'] = f'{beta_std[0]:.2f}'
-    stock_infopkg['STD'] = f'{beta_std[1]:.2f}'
-    stock_infopkg['52Wk High'] = f'{beta_std[2][ticker].High.max():.2f}'
-    stock_infopkg['52Wk Low'] = f'{beta_std[2][ticker].Low.min():.2f}'
-    stock_infopkg['Last Trading Day Open'] = f'{beta_std[2][ticker].Open[-1]:.2f}'
-    stock_infopkg['Last Trading Day Close'] = f'{beta_std[2][ticker].Close[-1]:.2f}'
+def stock_info(ticker):  
+    try:   
+        stock_infopkg = {}
+        beta_std = betastd(ticker)
+        stock_infopkg['Beta'] = f'{beta_std[0]:.2f}'
+        stock_infopkg['STD'] = f'{beta_std[1]:.2f}'
+        stock_infopkg['52Wk High'] = f'{beta_std[2][ticker].High.max():.2f}'
+        stock_infopkg['52Wk Low'] = f'{beta_std[2][ticker].Low.min():.2f}'
+        stock_infopkg['Last Trading Day Open'] = f'{beta_std[2][ticker].Open[-1]:.2f}'
+        stock_infopkg['Last Trading Day Close'] = f'{beta_std[2][ticker].Close[-1]:.2f}'
+        return stock_infopkg
 
-    return stock_infopkg
+    except: 
+        error_message = "Oops! There's no information available!"
+        return error_message
 
 
 # PyZipFile Class for creating ZIP archives containing Python libraries.     class zipfile.ZipInfo(filename='NoName', date_time=, 1980, 1, 1, 0, 0, 0)
 # Stock History 
 
+# Removes all invalid tickers from the list
 def valid_ticker_list(ticker_list):
     ticker_hist = yf.download(
                     tickers = " ".join(ticker_list),
@@ -69,6 +74,7 @@ def valid_ticker_list(ticker_list):
                 )
     return list(dict.fromkeys([t[0] for t in ticker_hist.dropna(axis=1, how='all').columns]))
 
+# Creates a list of closing prices of the most recent day available for each stock in ticker_list
 def create_price_list(ticker_list):
     new_ticker_list = sorted(ticker_list)
     price_list = []
@@ -120,34 +126,67 @@ class Portfolio:
         self.ticker_list.append(ticker)
 
 
+# Generates the DataFrame containing the history of a specified ticker, from an interval of start_date to end_date
 def stock_history(ticker, start_date, end_date):
-    current_date = datetime.date.today()
-    stock = yf.Ticker(ticker)
-    if start_date == "" or end_date == "":
-        stock_history = stock.history(start = datetime.date.today, end = datetime.date.today) 
-    else:
-        stock_history = stock.history(start = start_date, end = end_date) 
-    return stock_history
+    try:
+        current_date = datetime.date.today()
+        stock = yf.Ticker(ticker)
+        if start_date == "" or end_date == "":
+            stock_history = stock.history(start = datetime.date.today, end = datetime.date.today) 
+        else:
+            stock_history = stock.history(start = start_date, end = end_date) 
+        return stock_history
+    except: 
+        error_message = "Oops! There's no information available!"
+        return error_message
 
 
+# Generates a Equally Weighted Portfolio (each ticker has equal weighting)
+# ticker_list: list of Strings
+# starting_balance: integer
+# price_list: list of integers
+def equally_weighted(ticker_list, starting_balance, price_list):
+
+    # Create DataFrame
+    ew_portfolio = pd.DataFrame(index = ticker_list)
+    ew_portfolio["Shares"] = 0
+    num_tickers = len(ticker_list)
+    value_per_ticker = starting_balance/num_tickers
+    
+    # Get the shares for each ticker
+    for i in range(len(ticker_list)):
+        ew_portfolio['Shares'].loc[ticker_list[i]] = value_per_ticker/price_list[i]
+    
+    return ew_portfolio
+
+
+# Generates a Price Weighted Portfolio (each ticker has equal weighting)
+# ticker_list: list of Strings
+# starting_balance: integer
+# price_list: list of integers
 def price_weighted(ticker_list, starting_balance, price_list):
 
+    pricesum = sum(price_list)
+    value_per_ticker = []
+    for i in range(len(price_list)):
+        weight = price_list[i]/pricesum
+        value_per_ticker.append(weight*starting_balance)
+    
     # Create DataFrame
     pw_portfolio = pd.DataFrame(index = ticker_list)
     pw_portfolio["Shares"] = 0
-    num_tickers = len(ticker_list)
-    value_per_share = starting_balance/num_tickers
+     
+    # Get shares per each ticker
+    for i in range(len(ticker_list)):      
+        pw_portfolio['Shares'].loc[ticker_list[i]] = value_per_ticker[i]/price_list[i]
     
-    # Add Close price columns for each stock
-    
-    for i in range(len(ticker_list)):
-        
-        pw_portfolio['Shares'].loc[ticker_list[i]] = value_per_share/price_list[i]
-    
-
     return pw_portfolio
 
 
+# Generates a Market Weighted Portfolio (weighting is based off of market capitalization, and is weighted accordings to that)
+# ticker_list: list of Strings
+# starting_balance: integer
+# price_list: list of integers
 def market_weighted(ticker_list, starting_balance, price_list):
     
     stock_dict = {}
@@ -167,8 +206,12 @@ def market_weighted(ticker_list, starting_balance, price_list):
    
     return market_weighted_df
 
-    
-def portfolio_maker(ticker_list, weight_option, starting_balance):
+# Directly called from Finn Bot. Creates a portfolio from the specified arguments
+# ticker_list: list of strings
+# weight_option: string, should be PRICE WEIGHTED or MARKET WEIGHTED, or something related to smart weighted
+# starting_balance: integer
+# returns tuple, first element is actual portfolio DataFrame, second element is the last day that the tickers were traded (purchase date?)
+def portfolio_maker(ticker_list, weight_option, starting_balance, userid):
     
     # Get valid ticker list
     valid_tickers = valid_ticker_list(ticker_list)
@@ -178,41 +221,43 @@ def portfolio_maker(ticker_list, weight_option, starting_balance):
     if not valid_tickers:
         print('No valid tickers were inputted!')
         return None
-    elif len(valid_tickers) > 10:
+    elif len(valid_tickers) > 25:
         print('Exceeded Maximum Number of Tickers!')
         return None
     else:
         # check weight option
-        if weight_option == 'PRICE WEIGHTED':
+        if weight_option == 'EQUAL WEIGHTED':
+            portfolio = equally_weighted(valid_tickers,starting_balance,prices_list)
+        
+        elif weight_option == 'PRICE WEIGHTED':
             portfolio = price_weighted(valid_tickers,starting_balance,prices_list)
 
         elif weight_option == 'MARKET WEIGHTED':
             portfolio = market_weighted(valid_tickers,starting_balance,prices_list)
 
         else:
-            portfolio = smart_weighted(valid_tickers, weight_option)
-        
-        # if not portfolio.empty():
-        #     return None
-        # else:
-        #     pass
-
-        return (portfolio,last_day)
-
+            temp_portfolio = smart_weighted(valid_tickers, weight_option, starting_balance)
+            portfolio = temp_portfolio[0]
+            last_day = temp_portfolio[1]
+        add_portfolio(portfolio, userid, last_day)
+        return portfolio
 
 
 # Earnings per Share/ Return on equity?
 
 
 # Company info (location, industry, market capitalization)
+# 
 def company_info(ticker):
     try:
+        ticker = yf.Ticker(ticker)
         location = ticker.info['city'] + ", " + ticker.info['country']
         industry = ticker.info['industry']
         market_cap = ticker.info['marketCap']
         return [location, industry, market_cap]
     except: 
-        print("Oops! There's no information available!")
+        error_message = "Oops! There's no information available!"
+        return error_message
     
 
 def regenerate_portfolio(portfolio: dict):
@@ -225,6 +270,9 @@ def regenerate_portfolio(portfolio: dict):
     
     # Find the smallest date (earliest)
     earliest_date = sorted(incep_dates)[0]
+    latest_date = sorted(incep_dates)[-1]
+    if latest_date == last_tday:
+        return None
     
     # Download Stock Data
     pricing_data = yf.download(
@@ -277,6 +325,8 @@ def regenerate_portfolio(portfolio: dict):
 def portfolio_graphs(portfolio: dict, userid: int):
     # Create desired portfolio with ticker list
     data = regenerate_portfolio(portfolio)
+    if not data:
+        return None
     portfolio_df = data[0]
     initial_investment = data[1]
     print(initial_investment)

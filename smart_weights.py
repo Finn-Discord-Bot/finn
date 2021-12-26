@@ -9,7 +9,7 @@ from risky_smart_weights import generate_risky_portfolio
 
 
 def last_trading_day():
-    now = datetime.now(timezone(timedelta(hours=-5), 'EST'))
+    now = datetime.datetime.now(timezone(timedelta(hours=-5), 'EST'))
 
     # US Markets close at 4pm, but afterhours trading ends at 8pm.
     # yFinance stubbornly only gives the day's data after 8pm, so we will wait until 9pm to pull data from
@@ -23,8 +23,8 @@ def last_trading_day():
     else:
         DELTA = 0
         
-    start_date = (datetime.now() - timedelta(days=15)).strftime("%Y-%m-%d")
-    end_date = (datetime.now() - pd.tseries.offsets.BDay(DELTA)).strftime("%Y-%m-%d")
+    start_date = (datetime.datetime.now() - timedelta(days=15)).strftime("%Y-%m-%d")
+    end_date = (datetime.datetime.now() - pd.tseries.offsets.BDay(DELTA)).strftime("%Y-%m-%d")
     MarketIndex = "^GSPC" # We can use the S&P 500's data to see the last day where we have data
 
     market_hist = yf.Ticker(MarketIndex).history(start=start_date, end=end_date).filter(like="Close").dropna()   
@@ -39,7 +39,7 @@ def smart_weighted(ticker_list, option, initial_capital):
     elif option == 'RISKY':
         return generate_risky_portfolio(ticker_list, initial_capital)
     else:
-        start_date = (datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d")
+        start_date = (datetime.datetime.now() - timedelta(days=60)).strftime("%Y-%m-%d")
         end_date = last_trading_day()
         return generate_safe_portfolio(ticker_list, start_date, end_date, initial_capital)
 
@@ -78,7 +78,7 @@ def safe_method(ticker_list, start_date, end_date):
     returns = []
     volatility = []
 
-    for i in range (1000):
+    for i in range(10):
         individual_weights = np.random.random(len(ticker_list))
         individual_weights = individual_weights/np.sum(individual_weights)
         weights.append(individual_weights)
@@ -109,14 +109,13 @@ def safe_method(ticker_list, start_date, end_date):
 
 def generate_safe_portfolio(ticker_list, start_date, end_date, initial_capital):
     random_portfolios = safe_method(ticker_list, start_date, end_date)
-    random_portfolios
     safest_portfolio = random_portfolios.iloc[random_portfolios.Volatility.idxmin()]
 
     pd.DataFrame(safest_portfolio)
     
     date = last_trading_day()
     
-    current_day = datetime.strptime(date, "%Y-%m-%d")
+    current_day = datetime.datetime.strptime(date, "%Y-%m-%d")
 
     next_day = current_day + timedelta(days=1)
 
@@ -150,4 +149,4 @@ def generate_safe_portfolio(ticker_list, start_date, end_date, initial_capital):
     
     FinalPortfolio.set_index('Ticker', inplace=True)
             
-    return FinalPortfolio
+    return (FinalPortfolio, current_day)

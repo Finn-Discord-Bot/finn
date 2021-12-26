@@ -5,7 +5,31 @@ from datetime import datetime, timedelta, timezone
 from threading import Thread
 import random
 
-from finance_functions import *
+
+def last_trading_day():
+    rightnow = datetime.now(timezone(timedelta(hours=-5), 'EST'))
+
+    # US Markets close at 4pm, but afterhours trading ends at 8pm.
+    # yFinance stubbornly only gives the day's data after 8pm, so we will wait until 9pm to pull data from
+    # the current day.
+    market_close = rightnow.replace(hour=21, minute=0, second=0, microsecond=0)
+    if rightnow < market_close:
+        DELTA = 1
+    # If it is saturday or sunday
+    elif rightnow.weekday() >= 5:
+        DELTA = 1
+    else:
+        DELTA = 0
+        
+    start_date = (datetime.now() - timedelta(days=15)).strftime("%Y-%m-%d")
+    end_date = (datetime.now() - pd.tseries.offsets.BDay(DELTA)).strftime("%Y-%m-%d")
+    MarketIndex = "^GSPC" # We can use the S&P 500's data to see the last day where we have data
+
+    market_hist = yf.Ticker(MarketIndex).history(start=start_date, end=end_date).filter(like="Close").dropna()   
+
+    latest_day = market_hist.index[-1]
+    return latest_day.strftime("%Y-%m-%d")
+
 
 # get_stock_beta produces the beta of a specified ticker
 # Inputs:
@@ -70,9 +94,8 @@ def import_options(tickerlist, opt_start, opt_end, tickerhist):
 
 
 def generate_risky_portfolio(tickerlist: list, totalspend: int):
-    validtickerlist = valid_ticker_list(tickerlist)
     ticker_hist = yf.download(
-                tickers = " ".join(validtickerlist),
+                tickers = " ".join(tickerlist),
                 # Download Data From the past 6 months
                 period = "6mo",
                 interval = "1d",
@@ -122,8 +145,6 @@ def generate_risky_portfolio(tickerlist: list, totalspend: int):
     else:
         beta_final_ticker_list = list(sorted_beta_df.index)
     
-    print(beta_final_ticker_list)
-    
     # Options Analysis
     
     opt_start = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
@@ -140,13 +161,12 @@ def generate_risky_portfolio(tickerlist: list, totalspend: int):
         final_option_df = sorted_option_interest_df.tail(10)
         opt_tickers = list(final_option_df.index)
         print('Found an option portfolio')
-        print(final_option_df)
     else:
         option_interest_df = False
         print('Error - Insufficient options data for inputted tickers, skipping options analysis...')
     
     # Monte Carlo Analysis
-    trials = 100
+    trials = 10
     
     # We will collect the risk coefficients of all portfolios in this dictionary
     # Ultimately, we are comparing the best stocks obtained by the beta and options method,
@@ -227,4 +247,4 @@ def generate_risky_portfolio(tickerlist: list, totalspend: int):
     final_stocks_df.reset_index(inplace=True)
     final_stocks_df.columns = ['Ticker', 'Shares']
     final_stocks_df.set_index('Ticker', inplace=True)
-    return final_stocks_df
+    return (final_stocks_df, end_date)

@@ -7,6 +7,7 @@ from discord_slash.utils.manage_commands import create_choice, create_option
 import json
 import os
 import asyncio
+# import interactions
 
 from finance_functions import *
 from connect_database import *
@@ -116,7 +117,7 @@ async def _Help(ctx: SlashContext):
     """
     /companyinfo - Provides the location, industry, and market capitalization of a given stock \n
     /stockinfo - Displays an information preview of a specified ticker \n
-    /stockhistory - Provides stock history of a given stock. History includes opening and closing prices, and stock splits. \n
+    /stockhistory - Provides stock history of a given stock \n
 
     """, inline=True)
 
@@ -142,10 +143,7 @@ async def _Help(ctx: SlashContext):
     embed.set_image(url='https://cdn.discordapp.com/attachments/846084093065953283/924129382090539038/IMG_0005.jpg') 
     await ctx.send(embeds=[embed])
         
-        
-        
-        # FINISH THIS LATER WHEN ALL COMMANDS ARE DONE 
-        # MAKE HEADERS - Finance commands, stock commands, Portfolio commands, Misc Bot commands 
+    
     
 
 
@@ -200,11 +198,15 @@ async def _PriceWeightedIndex(ctx: SlashContext, tickerlist: str):
             required=True,
             choices = [
                 create_choice(
-                    name = "Price Weighted Index",
+                    name = "Equally Weighted",
+                    value = "EQUAL WEIGHTED"
+                ),
+                create_choice(
+                    name = "Price Weighted Portfolio",
                     value = "PRICE WEIGHTED"
                 ),
                 create_choice(
-                    name = "Market-Capitalization Weighted Index",
+                    name = "Market-Capitalization Weighted Portfolio",
                     value = "MARKET WEIGHTED"
                 ),
                 create_choice(
@@ -236,14 +238,11 @@ async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: st
     temp = []
     temp = tickerlist.split()
     # portfolio should be a tuple with (actualportfolio, date)
-    portfolio = portfolio_maker(temp, portfoliotype, money)
-    date = portfolio[1]
-    actualportfolio = portfolio[0]
-    add_portfolio(actualportfolio, user_id, date)
-    color=discord.Color.from_rgb(207, 189, 255)
-    # await ctx.send(content=f"I got you, you said {portfoliotype, tickerlist, str(money)}!")
+    portfolio_maker(temp, portfoliotype, money, user_id)
+    await ctx.defer()
+    await ctx.send(file=discord.File(f'process/{user_id}.csv'))
+    os.remove(f'process/{user_id}.csv')
     
-
 
 @slash.slash(
     name = "companyinfo",
@@ -258,24 +257,33 @@ async def _CreatePortfolio(ctx: SlashContext, portfoliotype: str, tickerlist: st
         )
     ]   
 )
-    
 async def _CompanyInfo(ctx: SlashContext, ticker: str):
     ticker = ticker.upper()
     comp_info = company_info(ticker)
-    location = comp_info[0]
-    industry = comp_info[1]
-    market_cap = comp_info[2]
-
-    embed = discord.Embed(
-        title = f'Company Information for {ticker}',
-        description = 'The location of the company, industry of the company and its market capitalization.',
+    if type(comp_info) == str:
+        embed = discord.Embed(
+        title = f'{ticker} does not have enough data.',
+        description = 'Please try another ticker.',
         color=discord.Color.from_rgb(255, 207, 233)
-    )
-    embed.set_author(name = 'Finn Bot')
-    embed.add_field(name = 'Company Location', value = location, inline=True)
-    embed.add_field(name = 'Company Industry', value = industry, inline=True)
-    embed.add_field(name = 'Maket Capitalization', value = market_cap, inline=True)
-    
+        )
+        embed.set_author(name = 'Finn Bot')
+        embed.add_field(name = 'ERROR, sorry!', value = "Please try with a different ticker.", inline = True)
+    else:
+        location = comp_info[0]
+        industry = comp_info[1]
+        market_cap = comp_info[2]
+
+        embed = discord.Embed(
+            title = f'Company Information for {ticker}',
+            description = 'The location of the company, industry of the company and its market capitalization.',
+            color=discord.Color.from_rgb(255, 207, 233)
+        )
+        embed.set_author(name = 'Finn Bot')
+        embed.add_field(name = 'Company Location', value = location, inline=True)
+        embed.add_field(name = 'Company Industry', value = industry, inline=True)
+        embed.add_field(name = 'Maket Capitalization', value = market_cap, inline=True)
+
+    embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/846084093065953283/924432164139978772/IMG_0010.jpg') 
     await ctx.send(embeds=[embed])
 
 
@@ -287,29 +295,38 @@ async def _CompanyInfo(ctx: SlashContext, ticker: str):
 async def _Displayportfolio(ctx: SlashContext):
     user_id = ctx.author.id
     portfolio_dict = get_portfolio(user_id)
-    print(portfolio_dict)
     data = portfolio_graphs(portfolio_dict, user_id)
-    initial_investment = data[0]
-    current_value = data[1]
-    net_return = current_value - initial_investment
-    pct_return = 100 * current_value/initial_investment 
-    color=discord.Color.from_rgb(255, 245, 189)
-    
-    embed = discord.Embed(
-        title = "Portfolio Returns",
-        description = "Here's your graph!",
-        colour = discord.Color.from_rgb(187, 242, 229)    
-    )
-    embed.set_author(name ='Finn Bot')
-    embed.add_field(name ='Initial Investment', value = initial_investment, inline=True)
-    embed.add_field(name ='Current Value', value = current_value, inline=True)
-    embed.add_field(name ='Net Return', value = net_return, inline=True)
-    embed.add_field(name ='% Return', value = pct_return, inline=True)
-    await ctx.send(embeds=[embed], file=discord.File(f'process/{user_id}.png'))
-    os.remove(f'process/{user_id}.png')
-
-
-    # await ctx.send(content=f"I've caught your uuid in 4K: {user_id}!")
+    if data:
+        initial_investment = data[0]
+        current_value = data[1]
+        net_return = current_value - initial_investment
+        pct_return = 100 * current_value/initial_investment 
+        color=discord.Color.from_rgb(255, 245, 189)
+        
+        embed = discord.Embed(
+            title = "Portfolio Returns",
+            description = "Here's your graph and investment information!",
+            colour = discord.Color.from_rgb(187, 242, 229)    
+        )
+        embed.set_author(name ='Finn Bot')
+        embed.add_field(name ='Initial Investment', value = "$" + (f'{initial_investment:.2f}'), inline=True)
+        embed.add_field(name ='Current Value', value = "$" + (f'{current_value:.2f}'), inline=True) 
+        embed.add_field(name ='Net Return', value = "$" + (f'{net_return:.2f}'), inline=True)
+        embed.add_field(name ='% Return', value = (f'{pct_return:.2f}') + "%", inline=True)
+        await ctx.send(embeds=[embed], file=discord.File(f'process/{user_id}.png'))
+        os.remove(f'process/{user_id}.png')
+    else:
+        embed = discord.Embed(
+            title = "ERROR",
+            description = "Please wait at least one more trading day to view your portfolio!",
+            colour = discord.Color.from_rgb(255, 204, 203)    
+        )
+        embed.set_author(name ='Finn Bot')
+        embed.add_field(name ='Initial Investment', value = "NA", inline=True)
+        embed.add_field(name ='Current Value', value = "NA", inline=True) 
+        embed.add_field(name ='Net Return', value = "NA", inline=True)
+        embed.add_field(name ='% Return', value = "NA", inline=True)
+        await ctx.send(embeds=[embed])
 
 
 # slash command for stock info
@@ -323,17 +340,10 @@ async def _Displayportfolio(ctx: SlashContext):
             description = "What Ticker would you like to search?",
             required = True,
             option_type = 3
-        ),
-        create_option(
-            name = "price",
-            description = "What price would you like to search?",
-            required=True,
-            option_type = 4
-            
         )
     ]
 )
-async def _StockInfo(ctx:SlashContext, ticker: str, price:int):
+async def _StockInfo(ctx:SlashContext, ticker: str):
     ticker = ticker.upper()
     response = discord.Embed(
         title = f"{ticker} Info",
@@ -360,6 +370,18 @@ async def _StockInfo(ctx:SlashContext, ticker: str, price:int):
         create_option(
             name = "ticker",
             description = "What ticker would you like to search?",
+            required = True,
+            option_type = 3
+        ),
+        create_option(
+            name = "start_date",
+            description = "What is your start date? (YYYY-MM-DD)",
+            required = True,
+            option_type = 3
+        ),
+        create_option(
+            name = "end_date",
+            description = "What is your end date? (YYYY-MM-DD)",
             required = True,
             option_type = 3
         )
@@ -421,7 +443,7 @@ async def _StockHistory(ctx: SlashContext, ticker: str, start_date: str, end_dat
         )
     ]
 )
-async def _Options(ctx:SlashContext, ticker: str, range: int, put_or_call: str):
+async def _Options(ctx:SlashContext, ticker: str, range_length: int, put_call: str):
     ticker = ticker.upper()
     response = discord.Embed(
         title = f"{ticker} Info",
@@ -481,11 +503,11 @@ async def _Sharperatio(ctx:SlashContext, ticker:str, start_date:str, end_date:st
 #    options = [
 #        create_option(
 #            name = "ticker1",
- #           description = "What Ticker would you like to search?",
-  #          required = True,
-   #         option_type = 3
-    #    ),
-     #   create_option(
+#            description = "What Ticker would you like to search?",
+#            required = True,
+#            option_type = 3
+#       ),
+#        create_option(
       #      name = "ticker2",
       #      description = "What Ticker would you like to search?",
        #     required=True,

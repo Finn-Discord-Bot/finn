@@ -5,6 +5,7 @@ from cassandra.query import tuple_factory
 from time import strftime, localtime
 import json
 
+
 with open('config/config.json', 'r') as config:
     conf = json.load(config)
     
@@ -15,9 +16,9 @@ session = cluster.connect('portfolios')  # select keyspace
 
 # Adds a dataframe straight to the portfolio
 def add_portfolio(portfolio_df, uuid: int, settledate: str):
-    remove_table(uuid)
     for ticker in portfolio_df.index:
         add_stock(uuid, ticker, float(portfolio_df.loc[ticker]), settledate)
+    portfolio_df.to_csv(f'process/{uuid}.csv')
 
 
 # Adds a stock to a user's portfolio
@@ -39,12 +40,14 @@ def remove_stock(uuid: int, ticker: str):
                     DELETE FROM user{uuid}
                     WHERE ticker = '{ticker}'
                     """)
+    return ticker
 
 
 def remove_table(uuid: int):
     session.execute(f"""
                     DROP TABLE IF EXISTS user{uuid}
                     """)
+    return "Removed"
 
 # Pull Portfolio from user
 def get_portfolio(uuid: int) -> dict:
