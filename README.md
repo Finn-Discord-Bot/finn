@@ -205,6 +205,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Contact
 
 Timothy Zheng - [Linkedin](https://www.linkedin.com/in/timothy-zheng21/) - timothyzheng123@gmail.com
-
+Daniel Jiang - [Linkedin](https://www.linkedin.com/in/danieljiang378/) - danieljiang378@gmail.com
 
 Devpost Link: [https://devpost.com/software/finn-u7hden](https://devpost.com/software/finn-u7hden)
