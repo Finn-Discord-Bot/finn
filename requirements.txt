@@ -3,6 +3,6 @@ discord==1.7.3
 discord-py-slash-command==4.2.1
 discord.py==1.7.3
 matplotlib==3.6.1
-numpy==1.22.2
+numpy==1.23.4
 pandas==1.4.1
 yfinance==0.1.77
