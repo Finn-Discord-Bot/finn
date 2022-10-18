@@ -204,7 +204,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Timothy Zheng - [Linkedin](https://www.linkedin.com/in/timothy-zheng21/) - timothyzheng123@gmail.com
+Timothy Zheng - [Linkedin](https://www.linkedin.com/in/timothyzheng/) - timothyzheng123@gmail.com
 
 Ethan Misa - [Linkedin](https://www.linkedin.com/in/ethanmisa/) - ethan.misa@gmail.com
 
